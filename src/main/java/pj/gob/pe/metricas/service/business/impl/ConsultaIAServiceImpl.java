@@ -197,4 +197,96 @@ public class ConsultaIAServiceImpl implements ConsultaIAService {
 
         return response;
     }
+
+    @Override
+    public Page<DetailConsultaIA> getDetailConsultaIA(String SessionId, InputDetailConsultaIA inputData, Pageable pageable) {
+
+        String errorValidacion = "";
+
+        if(SessionId == null || SessionId.isEmpty()){
+            errorValidacion = "La sessión remitida es inválida";
+            throw new ValidationSessionServiceException(errorValidacion);
+        }
+
+        ResponseLogin responseLogin = securityService.GetSessionData(SessionId);
+
+        if(responseLogin == null || !responseLogin.isSuccess() || !responseLogin.isItemFound() || responseLogin.getUser() == null){
+            errorValidacion = "La sessión remitida es inválida";
+            throw new ValidationSessionServiceException(errorValidacion);
+        }
+
+        Map<String, Object> filters = new HashMap<>();
+        if(Objects.equals(responseLogin.getUser().getIdTipoUser(), Constantes.USER_NORMAL)) {
+            filters.put("userId", responseLogin.getUser().getIdUser());
+        } else {
+            if(inputData.getIdUser() != null && inputData.getIdUser() > 0) {
+                filters.put("userId", inputData.getIdUser());
+            } else{
+                //Consultar por usuarios
+                boolean consultaPorUsuarios = false;
+
+                InputConsultaIAExternal inputConsultaIAExternal = new InputConsultaIAExternal();
+
+                if(inputData.getDocumento() != null && !inputData.getDocumento().isEmpty()) {
+                    consultaPorUsuarios = true;
+                    inputConsultaIAExternal.setDocumento(inputData.getDocumento());
+                }
+                if(inputData.getNombres() != null && !inputData.getNombres().isEmpty()) {
+                    consultaPorUsuarios = true;
+                    inputConsultaIAExternal.setNombres(inputData.getNombres());
+                }
+                if(inputData.getApellidos() != null && !inputData.getApellidos().isEmpty()) {
+                    consultaPorUsuarios = true;
+                    inputConsultaIAExternal.setApellidos(inputData.getApellidos());
+                }
+                if(inputData.getCargo() != null && !inputData.getCargo().isEmpty()) {
+                    consultaPorUsuarios = true;
+                    inputConsultaIAExternal.setCargo(inputData.getCargo());
+                }
+                if(inputData.getUsername() != null && !inputData.getUsername().isEmpty()) {
+                    consultaPorUsuarios = true;
+                    inputConsultaIAExternal.setUsername(inputData.getUsername());
+                }
+                if(inputData.getEmail() != null && !inputData.getEmail().isEmpty()) {
+                    consultaPorUsuarios = true;
+                    inputConsultaIAExternal.setEmail(inputData.getEmail());
+                }
+
+                if(consultaPorUsuarios){
+                    List<OutputConsultaIAExternal> listUsers = securityService.Getusers(inputConsultaIAExternal);
+
+                    if(listUsers == null || listUsers.isEmpty()) {
+                        Page<DetailConsultaIA> response = new PageImpl<>(Collections.emptyList(), pageable, 0);
+                        return response;
+                    }
+
+                    // Agregar los IDs de los usuarios encontrados
+                    filters.put("list_userId", listUsers.stream().map(OutputConsultaIAExternal::getId).toList());
+                }
+            }
+        }
+
+        Map<String, Object> filtersFecha = new HashMap<>();
+        Map<String, Object> filtersNotEquals = new HashMap<>();
+        if(inputData.getModel() != null && !inputData.getModel().isEmpty()) {
+            filters.put("model", inputData.getModel());
+        }
+
+        if(inputData.getSessionUID() != null && !inputData.getSessionUID().isEmpty()) {
+            filters.put("sessionUID", inputData.getSessionUID());
+        }
+
+        if(inputData.getFechaInicio() != null && inputData.getFechaFin() != null) {
+            filtersFecha.put("fechaInicio", inputData.getFechaInicio());
+            filtersFecha.put("fechaFin", inputData.getFechaFin());
+        } else if(inputData.getFechaInicio() != null) {
+            filtersFecha.put("fechaInicio", inputData.getFechaInicio());
+        } else if(inputData.getFechaFin() != null) {
+            filtersFecha.put("fechaFin", inputData.getFechaFin());
+        }
+
+        Page<DetailConsultaIA> response = detailConsultaIADAO.getDetailConsultaIA(filters, filtersNotEquals, filtersFecha, pageable);
+
+        return response;
+    }
 }
