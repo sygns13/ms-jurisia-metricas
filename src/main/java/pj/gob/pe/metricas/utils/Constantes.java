@@ -11,8 +11,6 @@ public class Constantes {
     public static final Integer REGISTRO_NO_BORRADO = 0;
     public static final Integer REGISTRO_NO_BORRADO_2_DEFAULT = 2;
 
-    public static final String SUPER_ADMINISTRADOR = "1";
-
     public static final String CANTIDAD_UNIDAD = "1";
 
     public static final Integer CANTIDAD_ZERO = 0;
@@ -33,5 +31,10 @@ public class Constantes {
     public static final Integer COMPLETION_INICIADO = 0;
     public static final Integer COMPLETION_EXITOSO = 1;
     public static final Integer COMPLETION_ERROR = 2;
+
+    public static final Long USER_SUPER_ADMINISTRADOR = 1L;
+    public static final Long USER_ADMINISTRADOR = 2L;
+    public static final Long USER_NORMAL = 3L;
+    public static final Long USER_REPORTES = 4L;
 
 }

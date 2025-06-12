@@ -3,8 +3,9 @@ package pj.gob.pe.metricas.repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import pj.gob.pe.metricas.model.entities.CabConsultaIA;
+import pj.gob.pe.metricas.repository.custom.CabConsultaIACustomRepo;
 
-public interface CabConsultaIARepo extends GenericRepo<CabConsultaIA, Long> {
+public interface CabConsultaIARepo extends GenericRepo<CabConsultaIA, Long>, CabConsultaIACustomRepo {
 
     @Query(
             value = "select " +

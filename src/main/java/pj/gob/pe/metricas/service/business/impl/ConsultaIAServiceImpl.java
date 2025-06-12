@@ -1,28 +1,39 @@
 package pj.gob.pe.metricas.service.business.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import pj.gob.pe.metricas.configuration.ConfigProperties;
 import pj.gob.pe.metricas.dao.CabConsultaIADAO;
 import pj.gob.pe.metricas.dao.DetailConsultaIADAO;
+import pj.gob.pe.metricas.exception.ValidationSessionServiceException;
 import pj.gob.pe.metricas.model.beans.Completions;
 import pj.gob.pe.metricas.model.entities.CabConsultaIA;
 import pj.gob.pe.metricas.model.entities.DetailConsultaIA;
 import pj.gob.pe.metricas.service.business.ConsultaIAService;
-import pj.gob.pe.metricas.utils.Constantes;
+import pj.gob.pe.metricas.service.externals.SecurityService;
+import pj.gob.pe.metricas.utils.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class ConsultaIAServiceImpl implements ConsultaIAService {
 
+    private final SecurityService securityService;
     private final ConfigProperties configProperties;
     private final CabConsultaIADAO cabConsultaIADAO;
     private final DetailConsultaIADAO detailConsultaIADAO;
+
+    private static final Logger logger = LoggerFactory.getLogger(ConsultaIAServiceImpl.class);
 
     @Override
     public void RegistrarConsultaIA(Completions completions) throws Exception {
@@ -100,5 +111,90 @@ public class ConsultaIAServiceImpl implements ConsultaIAService {
         detailConsultaIA.setRegTimestamp(fechaActualTime.toEpochSecond(ZoneOffset.UTC));
 
         detailConsultaIADAO.registrar(detailConsultaIA);
+    }
+
+    @Override
+    public Page<CabConsultaIA> getGeneralConsultaIA(String SessionId, InputConsultaIA inputData, Pageable pageable) {
+
+        String errorValidacion = "";
+
+        if(SessionId == null || SessionId.isEmpty()){
+            errorValidacion = "La sessión remitida es inválida";
+            throw new ValidationSessionServiceException(errorValidacion);
+        }
+
+        ResponseLogin responseLogin = securityService.GetSessionData(SessionId);
+
+        if(responseLogin == null || !responseLogin.isSuccess() || !responseLogin.isItemFound() || responseLogin.getUser() == null){
+            errorValidacion = "La sessión remitida es inválida";
+            throw new ValidationSessionServiceException(errorValidacion);
+        }
+
+        Map<String, Object> filters = new HashMap<>();
+        if(Objects.equals(responseLogin.getUser().getIdTipoUser(), Constantes.USER_NORMAL)) {
+            filters.put("userId", responseLogin.getUser().getIdUser());
+        } else {
+            if(inputData.getIdUser() != null && inputData.getIdUser() > 0) {
+                filters.put("userId", inputData.getIdUser());
+            } else{
+                //Consultar por usuarios
+                boolean consultaPorUsuarios = false;
+
+                InputConsultaIAExternal inputConsultaIAExternal = new InputConsultaIAExternal();
+
+                if(inputData.getDocumento() != null && !inputData.getDocumento().isEmpty()) {
+                    consultaPorUsuarios = true;
+                    inputConsultaIAExternal.setDocumento(inputData.getDocumento());
+                }
+                if(inputData.getNombres() != null && !inputData.getNombres().isEmpty()) {
+                    consultaPorUsuarios = true;
+                    inputConsultaIAExternal.setNombres(inputData.getNombres());
+                }
+                if(inputData.getApellidos() != null && !inputData.getApellidos().isEmpty()) {
+                    consultaPorUsuarios = true;
+                    inputConsultaIAExternal.setApellidos(inputData.getApellidos());
+                }
+                if(inputData.getCargo() != null && !inputData.getCargo().isEmpty()) {
+                    consultaPorUsuarios = true;
+                    inputConsultaIAExternal.setCargo(inputData.getCargo());
+                }
+                if(inputData.getUsername() != null && !inputData.getUsername().isEmpty()) {
+                    consultaPorUsuarios = true;
+                    inputConsultaIAExternal.setUsername(inputData.getUsername());
+                }
+                if(inputData.getEmail() != null && !inputData.getEmail().isEmpty()) {
+                    consultaPorUsuarios = true;
+                    inputConsultaIAExternal.setEmail(inputData.getEmail());
+                }
+
+                if(consultaPorUsuarios){
+                    List<OutputConsultaIAExternal> listUsers = securityService.Getusers(inputConsultaIAExternal);
+
+                    if(listUsers == null || listUsers.isEmpty()) {
+                        Page<CabConsultaIA> response = new PageImpl<>(Collections.emptyList(), pageable, 0);
+                        return response;
+                    }
+
+                    // Agregar los IDs de los usuarios encontrados
+                    filters.put("list_userId", listUsers.stream().map(OutputConsultaIAExternal::getId).toList());
+                }
+            }
+        }
+
+        Map<String, Object> filtersFecha = new HashMap<>();
+        Map<String, Object> filtersNotEquals = new HashMap<>();
+
+        if(inputData.getFechaInicio() != null && inputData.getFechaFin() != null) {
+            filtersFecha.put("fechaInicio", inputData.getFechaInicio());
+            filtersFecha.put("fechaFin", inputData.getFechaFin());
+        } else if(inputData.getFechaInicio() != null) {
+            filtersFecha.put("fechaInicio", inputData.getFechaInicio());
+        } else if(inputData.getFechaFin() != null) {
+            filtersFecha.put("fechaFin", inputData.getFechaFin());
+        }
+
+        Page<CabConsultaIA> response = cabConsultaIADAO.getGeneralConsultaIA(filters, filtersNotEquals, filtersFecha, pageable);
+
+        return response;
     }
 }

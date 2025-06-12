@@ -71,4 +71,6 @@ api:
     get:
       session:
         path: /v1/auth/session/:sessionId
+      users:
+        path: /v1/users/listar-interservices
 

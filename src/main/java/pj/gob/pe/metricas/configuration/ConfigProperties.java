@@ -20,6 +20,9 @@ public class ConfigProperties {
     @Value("${api.security.get.session.path}")
     private String pathGetSession;
 
+    @Value("${api.security.get.users.path}")
+    private String pathGetUsers;
+
     @Value("${spring.data.redis.prefix:jurisia_metrics}")
     private String REDIS_KEY_PREFIX;
 
