@@ -4,6 +4,7 @@ use JURISDB_METRICS;
 CREATE TABLE If Not Exists JURISDB_METRICS.CabConsultaIA (
   id bigint unsigned primary key not null auto_increment,
   userId bigint DEFAULT NULL Comment 'ID de Usuario',
+  model char(50) DEFAULT NULL Comment 'Modelo de IA utilizado',
   countMessages int default 0 Comment 'Cantidad de mensajes procesados',
   firstSendMessage text Null Comment 'Primer mensaje enviado por el usuario',
   lastSendMessage text Null Comment 'Ultimo mensaje enviado por el usuario',
@@ -24,6 +25,7 @@ COMMENT = 'Tabla de Cabecera de Consultas a la IA (Inteligencia Artificial)';
 -- Indexacion
 ALTER TABLE JURISDB_METRICS.CabConsultaIA
     ADD INDEX userIdIDX (userId),
+    ADD INDEX modelIDX (model),
     ADD INDEX countMessagesIDX (countMessages),
     ADD INDEX sessionUIDIDX (sessionUID),
     ADD INDEX regDateIDX (regDate),

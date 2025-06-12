@@ -1,4 +1,4 @@
-package pj.gob.pe.metricas.dao;
+package pj.gob.pe.metricas.repository.custom;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -6,7 +6,7 @@ import pj.gob.pe.metricas.model.entities.CabDocumentoGenerado;
 
 import java.util.Map;
 
-public interface CabDocumentoGeneradoDAO extends GenericDAO<CabDocumentoGenerado, Long>{
+public interface CabDocumentoGeneradoCustomRepo {
 
     Page<CabDocumentoGenerado> getGeneralDocumentoGeneradoIA(
             Map<String, Object> filters,

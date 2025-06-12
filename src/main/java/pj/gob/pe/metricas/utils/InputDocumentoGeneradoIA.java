@@ -7,12 +7,13 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-@Schema(description = "Input Consulta IA Filters")
+@Schema(description = "Input Documento Generado Filters")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InputConsultaIA {
+public class InputDocumentoGeneradoIA {
 
+    //Seccion Usuario
     @Schema(description = "ID de Usuario")
     private Long idUser;
 
@@ -34,12 +35,26 @@ public class InputConsultaIA {
     @Schema(description = "Email de Usuario")
     private String email;
 
+    //Seccion Documento Generado
+    private String typedoc;
+    private String codSede;
+    private String codInstancia;
+    private String codEspecialidad;
+    private String codMateria;
+    private String numeroExpediente;
+    private String yearExpediente;
+    private Long idDocumento;
+    private Long idTipoDocumento;
+    private Long nUnico;
+    private String xFormato;
+    private String dniDemandante;
+    private String dniDemandado;
+    private String templateCode;
+    private Long templateID;
+
     @Schema(description = "Fecha de Inicio de Consulta")
     private LocalDate fechaInicio;
 
     @Schema(description = "Fecha F de Consulta")
     private LocalDate fechaFin;
-
-    @Schema(description = "Modelo de IA utilizado")
-    private String model;
 }

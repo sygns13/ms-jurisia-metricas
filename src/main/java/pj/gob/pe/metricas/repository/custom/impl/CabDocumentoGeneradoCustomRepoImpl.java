@@ -7,54 +7,56 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-import pj.gob.pe.metricas.model.entities.DetailConsultaIA;
-import pj.gob.pe.metricas.repository.custom.DetailConsultaIACustomRepo;
+import pj.gob.pe.metricas.model.entities.CabDocumentoGenerado;
+import pj.gob.pe.metricas.model.entities.CabDocumentoGenerado;
+import pj.gob.pe.metricas.model.entities.CabDocumentoGenerado;
+import pj.gob.pe.metricas.repository.custom.CabDocumentoGeneradoCustomRepo;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Repository
-public class DetailConsultaIACustomRepoImpl implements DetailConsultaIACustomRepo {
+public class CabDocumentoGeneradoCustomRepoImpl implements CabDocumentoGeneradoCustomRepo {
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Override
-    public Page<DetailConsultaIA> getDetailConsultaIA(Map<String, Object> filters, Map<String, Object> notEqualFilters, Map<String, Object> filtersFecha, Pageable pageable) {
+    public Page<CabDocumentoGenerado> getGeneralDocumentoGeneradoIA(Map<String, Object> filters, Map<String, Object> notEqualFilters, Map<String, Object> filtersFecha, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
         // Consulta principal para obtener los datos paginados
-        CriteriaQuery<DetailConsultaIA> query = cb.createQuery(DetailConsultaIA.class);
-        Root<DetailConsultaIA> detailConsultaIA = query.from(DetailConsultaIA.class);
+        CriteriaQuery<CabDocumentoGenerado> query = cb.createQuery(CabDocumentoGenerado.class);
+        Root<CabDocumentoGenerado> cabDocumentoGenerado = query.from(CabDocumentoGenerado.class);
 
         // Construir predicados y subconsulta (similar al código anterior)
-        Predicate mainPredicate = buildPredicate(detailConsultaIA, cb, filters, notEqualFilters, filtersFecha);
+        Predicate mainPredicate = buildPredicate(cabDocumentoGenerado, cb, filters, notEqualFilters, filtersFecha);
 
-        query.select(detailConsultaIA).where(mainPredicate);
+        query.select(cabDocumentoGenerado).where(mainPredicate);
 
         // Aplicar ordenamiento desde Pageable
         if (pageable.getSort().isSorted()) {
             List<Order> orders = new ArrayList<>();
             pageable.getSort().forEach(order -> {
                 if (order.isAscending()) {
-                    orders.add(cb.asc(detailConsultaIA.get(order.getProperty())));
+                    orders.add(cb.asc(cabDocumentoGenerado.get(order.getProperty())));
                 } else {
-                    orders.add(cb.desc(detailConsultaIA.get(order.getProperty())));
+                    orders.add(cb.desc(cabDocumentoGenerado.get(order.getProperty())));
                 }
             });
             query.orderBy(orders);
         }
 
         // Ejecutar consulta paginada
-        List<DetailConsultaIA> resultList = entityManager.createQuery(query)
+        List<CabDocumentoGenerado> resultList = entityManager.createQuery(query)
                 .setFirstResult((int) pageable.getOffset())
                 .setMaxResults(pageable.getPageSize())
                 .getResultList();
 
         // Consulta para obtener el total de elementos (count)
         CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
-        Root<DetailConsultaIA> countRoot = countQuery.from(DetailConsultaIA.class);
+        Root<CabDocumentoGenerado> countRoot = countQuery.from(CabDocumentoGenerado.class);
         Predicate countPredicate = buildPredicate(countRoot, cb, filters, notEqualFilters, filtersFecha);
 
         // Contar el total de grupos únicos de "session" que cumplen los filtros
@@ -67,7 +69,7 @@ public class DetailConsultaIACustomRepoImpl implements DetailConsultaIACustomRep
 
     // Método helper para construir predicados dinámicos
     private Predicate buildPredicate(
-            Root<DetailConsultaIA> root,
+            Root<CabDocumentoGenerado> root,
             CriteriaBuilder cb,
             Map<String, Object> filters,
             Map<String, Object> notEqualFilters) {
@@ -104,7 +106,7 @@ public class DetailConsultaIACustomRepoImpl implements DetailConsultaIACustomRep
 
     // Método helper para construir predicados dinámicos
     private Predicate buildPredicate(
-            Root<DetailConsultaIA> root,
+            Root<CabDocumentoGenerado> root,
             CriteriaBuilder cb,
             Map<String, Object> filters,
             Map<String, Object> notEqualFilters,

@@ -27,6 +27,10 @@ public class CabConsultaIA {
     @Schema(description = "ID del usuario", example = "12345")
     private Long userId;
 
+    @Column(name = "model", length = 50, nullable = false)
+    @Schema(description = "Modelo utilizado", example = "GPT-4")
+    private String model;
+
     @Column(name = "countMessages")
     @Schema(description = "Cantidad de mensajes procesados", example = "12345")
     private Integer countMessages;

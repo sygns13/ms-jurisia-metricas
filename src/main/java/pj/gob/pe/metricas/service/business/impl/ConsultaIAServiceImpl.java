@@ -48,6 +48,7 @@ public class ConsultaIAServiceImpl implements ConsultaIAService {
             CabConsultaIA cabConsultaIA = new CabConsultaIA();
 
             cabConsultaIA.setUserId(completions.getUserId());
+            cabConsultaIA.setModel(completions.getModel());
             cabConsultaIA.setCountMessages(Constantes.CANTIDAD_UNIDAD_INTEGER);
             cabConsultaIA.setFirstSendMessage(completions.getRoleUser());
             cabConsultaIA.setLastSendMessage(completions.getRoleUser());
@@ -181,6 +182,10 @@ public class ConsultaIAServiceImpl implements ConsultaIAService {
             }
         }
 
+        if(inputData.getModel() != null && !inputData.getModel().isEmpty()) {
+            filters.put("model", inputData.getModel());
+        }
+
         Map<String, Object> filtersFecha = new HashMap<>();
         Map<String, Object> filtersNotEquals = new HashMap<>();
 
@@ -266,8 +271,7 @@ public class ConsultaIAServiceImpl implements ConsultaIAService {
             }
         }
 
-        Map<String, Object> filtersFecha = new HashMap<>();
-        Map<String, Object> filtersNotEquals = new HashMap<>();
+
         if(inputData.getModel() != null && !inputData.getModel().isEmpty()) {
             filters.put("model", inputData.getModel());
         }
@@ -276,6 +280,8 @@ public class ConsultaIAServiceImpl implements ConsultaIAService {
             filters.put("sessionUID", inputData.getSessionUID());
         }
 
+        Map<String, Object> filtersFecha = new HashMap<>();
+        Map<String, Object> filtersNotEquals = new HashMap<>();
         if(inputData.getFechaInicio() != null && inputData.getFechaFin() != null) {
             filtersFecha.put("fechaInicio", inputData.getFechaInicio());
             filtersFecha.put("fechaFin", inputData.getFechaFin());
