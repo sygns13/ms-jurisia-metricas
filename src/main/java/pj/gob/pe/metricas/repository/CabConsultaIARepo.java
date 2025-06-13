@@ -9,7 +9,7 @@ public interface CabConsultaIARepo extends GenericRepo<CabConsultaIA, Long>, Cab
 
     @Query(
             value = "select " +
-                    "id, userId, countMessages, firstSendMessage, lastSendMessage, firstResponseMessage, lastResponseMessage, sessionUID, regDate, regDatetime, regTimestamp, updDate, updDatetime, updTimestamp " +
+                    "id, userId, model, countMessages, firstSendMessage, lastSendMessage, firstResponseMessage, lastResponseMessage, sessionUID, regDate, regDatetime, regTimestamp, updDate, updDatetime, updTimestamp " +
                     "from JURISDB_METRICS.CabConsultaIA " +
                     "where " +
                     "sessionUID = :sessionUID " +
