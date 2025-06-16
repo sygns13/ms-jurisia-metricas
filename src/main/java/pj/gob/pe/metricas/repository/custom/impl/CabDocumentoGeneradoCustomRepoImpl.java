@@ -67,6 +67,37 @@ public class CabDocumentoGeneradoCustomRepoImpl implements CabDocumentoGeneradoC
         return new PageImpl<>(resultList, pageable, totalElements);
     }
 
+
+    @Override
+    public Long getTotalDocGenerados(
+            Map<String, Object> filters,
+            Map<String, Object> notEqualFilters) {
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+
+        // Consulta principal para obtener los datos paginados
+        CriteriaQuery<CabDocumentoGenerado> query = cb.createQuery(CabDocumentoGenerado.class);
+        Root<CabDocumentoGenerado> cabDocumentoGenerado = query.from(CabDocumentoGenerado.class);
+        
+        // Construir predicados y subconsulta (similar al código anterior)
+        Predicate mainPredicate = buildPredicate(cabDocumentoGenerado, cb, filters, notEqualFilters);
+
+        query.select(cabDocumentoGenerado).where(mainPredicate);
+
+        // Consulta para obtener el total de elementos (count)
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<CabDocumentoGenerado> countRoot = countQuery.from(CabDocumentoGenerado.class);
+        Predicate countPredicate = buildPredicate(countRoot, cb, filters, notEqualFilters);
+
+        // Contar el total de grupos únicos de "session" que cumplen los filtros
+        countQuery.select(cb.countDistinct(countRoot.get("sessionUID"))) // ¡Clave aquí!
+                .where(countPredicate);
+
+        Long totalElements = entityManager.createQuery(countQuery).getSingleResult();
+
+        return totalElements;
+    }
+
     // Método helper para construir predicados dinámicos
     private Predicate buildPredicate(
             Root<CabDocumentoGenerado> root,

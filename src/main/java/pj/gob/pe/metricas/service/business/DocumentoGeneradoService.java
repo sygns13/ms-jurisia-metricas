@@ -13,4 +13,6 @@ public interface DocumentoGeneradoService {
             String SessionId,
             InputDocumentoGeneradoIA inputData,
             Pageable pageable);
+
+    Long getTotalDocGenerados(String buscar, String SessionId) throws Exception;
 }

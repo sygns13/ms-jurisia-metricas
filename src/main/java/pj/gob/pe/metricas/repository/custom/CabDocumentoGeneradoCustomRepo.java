@@ -13,4 +13,8 @@ public interface CabDocumentoGeneradoCustomRepo {
             Map<String, Object> notEqualFilters,
             Map<String, Object> filtersFecha,
             Pageable pageable);
+
+    Long getTotalDocGenerados(
+            Map<String, Object> filters,
+            Map<String, Object> notEqualFilters);
 }

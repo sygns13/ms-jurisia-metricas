@@ -29,4 +29,11 @@ public class CabDocumentoGeneradoDAOImpl extends GenericDAOImpl<CabDocumentoGene
             Pageable pageable) {
         return repo.getGeneralDocumentoGeneradoIA(filters, notEqualFilters, filtersFecha, pageable);
     }
+
+    @Override
+    public Long getTotalDocGenerados(
+            Map<String, Object> filters,
+            Map<String, Object> notEqualFilters){
+        return repo.getTotalDocGenerados(filters, notEqualFilters);
+    }
 }

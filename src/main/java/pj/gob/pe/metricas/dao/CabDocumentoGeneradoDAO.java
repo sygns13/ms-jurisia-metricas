@@ -13,4 +13,8 @@ public interface CabDocumentoGeneradoDAO extends GenericDAO<CabDocumentoGenerado
             Map<String, Object> notEqualFilters,
             Map<String, Object> filtersFecha,
             Pageable pageable);
+
+    Long getTotalDocGenerados(
+            Map<String, Object> filters,
+            Map<String, Object> notEqualFilters);
 }

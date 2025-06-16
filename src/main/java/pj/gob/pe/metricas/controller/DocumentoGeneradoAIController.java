@@ -15,6 +15,7 @@ import pj.gob.pe.metricas.exception.ModeloNotFoundException;
 import pj.gob.pe.metricas.model.entities.CabDocumentoGenerado;
 import pj.gob.pe.metricas.service.business.DocumentoGeneradoService;
 import pj.gob.pe.metricas.utils.InputDocumentoGeneradoIA;
+import pj.gob.pe.metricas.utils.ResponseTotalDocGenerados;
 
 @Tag(name = "Service Metrics Controller", description = "Endpoints de servicio de métricas para Documento Generado IA")
 @RestController
@@ -24,7 +25,7 @@ public class DocumentoGeneradoAIController {
     
     private final DocumentoGeneradoService documentoGeneradoService;
 
-    @Operation(summary = "Obtencion de Reporte de Cabeceras de ConsultaIA", description = "Obtencion de Reporte de Cabeceras de ConsultaIA")
+    @Operation(summary = "Obtencion de Reporte de  Documento Generado IA", description = "Obtencion de Reporte de  Documento Generado IA")
     @PostMapping("/get-data")
     public ResponseEntity<Page<CabDocumentoGenerado>> reportCabDocumentoGenerado(
             @RequestHeader("SessionId") String SessionId,
@@ -41,5 +42,25 @@ public class DocumentoGeneradoAIController {
         }
 
         return new ResponseEntity<Page<CabDocumentoGenerado>>(dataResponse, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get Total de  Documento Generado IA", description = "Get de Documento Generado IA")
+    @GetMapping("/gettotaloperaciones")
+    public ResponseEntity<ResponseTotalDocGenerados> list(
+            @RequestHeader("SessionId") String SessionId) throws Exception{
+
+        String buscar = "";
+
+        Long totalConversaciones = documentoGeneradoService.getTotalDocGenerados(buscar, SessionId);
+
+        if(totalConversaciones == null) {
+            throw new ModeloNotFoundException("Error de procesamiento de Datos. Comunicarse con un administrador ");
+        }
+
+        ResponseTotalDocGenerados responseTotalConversaciones = new ResponseTotalDocGenerados();
+
+        responseTotalConversaciones.setTotalDocsGenerados(totalConversaciones);
+
+        return new ResponseEntity<>(responseTotalConversaciones, HttpStatus.OK);
     }
 }

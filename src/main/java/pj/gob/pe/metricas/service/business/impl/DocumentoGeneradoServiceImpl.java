@@ -163,4 +163,31 @@ public class DocumentoGeneradoServiceImpl implements DocumentoGeneradoService {
 
         return response;
     }
+
+    @Override
+    public Long getTotalDocGenerados(String buscar, String SessionId) throws Exception {
+
+        String errorValidacion = "";
+
+        if(SessionId == null || SessionId.isEmpty()){
+            errorValidacion = "La sessión remitida es inválida";
+            throw new ValidationSessionServiceException(errorValidacion);
+        }
+
+        ResponseLogin responseLogin = securityService.GetSessionData(SessionId);
+
+        if(responseLogin == null || !responseLogin.isSuccess() || !responseLogin.isItemFound() || responseLogin.getUser() == null){
+            errorValidacion = "La sessión remitida es inválida";
+            throw new ValidationSessionServiceException(errorValidacion);
+        }
+
+        Map<String, Object> filters = new HashMap<>();
+        filters.put("userId", responseLogin.getUser().getIdUser());
+
+        Map<String, Object> filtersNotEquals = new HashMap<>();
+
+        Long totalElementos = cabDocumentoGeneradoDAO.getTotalDocGenerados(filters, filtersNotEquals);
+
+        return totalElementos;
+    }
 }
