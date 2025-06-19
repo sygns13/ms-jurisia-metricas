@@ -39,8 +39,8 @@ public class ResponseTotalFiltersDocGenerados {
     private String model;
     private String numeroExpediente;
     private String yearExpediente;
-    private String xFormato;
-    private Long nUnico;
+    private String xdeFormato;
+    private Long numUnico;
 
     private Long totalDocsGenerados;
 

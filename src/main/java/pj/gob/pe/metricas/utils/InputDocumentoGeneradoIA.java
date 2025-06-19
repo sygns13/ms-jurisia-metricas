@@ -45,8 +45,8 @@ public class InputDocumentoGeneradoIA {
     private String yearExpediente;
     private Long idDocumento;
     private Long idTipoDocumento;
-    private Long nUnico;
-    private String xFormato;
+    private Long numUnico;
+    private String xdeFormato;
     private String dniDemandante;
     private String dniDemandado;
     private String templateCode;

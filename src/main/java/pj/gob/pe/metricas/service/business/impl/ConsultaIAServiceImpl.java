@@ -132,7 +132,7 @@ public class ConsultaIAServiceImpl implements ConsultaIAService {
         }
 
         Map<String, Object> filters = new HashMap<>();
-        if(Objects.equals(responseLogin.getUser().getIdTipoUser(), Constantes.USER_NORMAL)) {
+        if(Objects.equals(responseLogin.getUser().getIdTipoUser(), Constantes.USER_NORMAL_2)) {
             filters.put("userId", responseLogin.getUser().getIdUser());
         } else {
             if(inputData.getIdUser() != null && inputData.getIdUser() > 0) {
@@ -221,7 +221,7 @@ public class ConsultaIAServiceImpl implements ConsultaIAService {
         }
 
         Map<String, Object> filters = new HashMap<>();
-        if(Objects.equals(responseLogin.getUser().getIdTipoUser(), Constantes.USER_NORMAL)) {
+        if(Objects.equals(responseLogin.getUser().getIdTipoUser(), Constantes.USER_NORMAL_2)) {
             filters.put("userId", responseLogin.getUser().getIdUser());
         } else {
             if(inputData.getIdUser() != null && inputData.getIdUser() > 0) {

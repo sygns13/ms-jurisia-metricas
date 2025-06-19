@@ -14,6 +14,7 @@ import pj.gob.pe.metricas.service.business.DocumentoGeneradoService;
 import pj.gob.pe.metricas.service.externals.SecurityService;
 import pj.gob.pe.metricas.utils.*;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -51,7 +52,7 @@ public class DocumentoGeneradoServiceImpl implements DocumentoGeneradoService {
         }
 
         Map<String, Object> filters = new HashMap<>();
-        if(Objects.equals(responseLogin.getUser().getIdTipoUser(), Constantes.USER_NORMAL)) {
+        if(Objects.equals(responseLogin.getUser().getIdTipoUser(), Constantes.USER_NORMAL_2)) {
             filters.put("userId", responseLogin.getUser().getIdUser());
         } else {
             if(inputData.getIdUser() != null && inputData.getIdUser() > 0) {
@@ -129,11 +130,11 @@ public class DocumentoGeneradoServiceImpl implements DocumentoGeneradoService {
         if(inputData.getIdTipoDocumento() != null && inputData.getIdTipoDocumento() > 0) {
             filters.put("idTipoDocumento", inputData.getIdTipoDocumento());
         }
-        if(inputData.getNUnico() != null && inputData.getNUnico() > 0) {
-            filters.put("nUnico", inputData.getNUnico());
+        if(inputData.getNumUnico() != null && inputData.getNumUnico() > 0) {
+            filters.put("nUnico", inputData.getNumUnico());
         }
-        if(inputData.getXFormato() != null && !inputData.getXFormato().isEmpty()) {
-            filters.put("xFormato", inputData.getXFormato());
+        if(inputData.getXdeFormato() != null && !inputData.getXdeFormato().isEmpty()) {
+            filters.put("xFormato", inputData.getXdeFormato());
         }
         if(inputData.getDniDemandante() != null && !inputData.getDniDemandante().isEmpty()) {
             filters.put("dniDemandante", inputData.getDniDemandante());
@@ -212,7 +213,7 @@ public class DocumentoGeneradoServiceImpl implements DocumentoGeneradoService {
         boolean pasaValidacionUsuarios = true;
 
         Map<String, Object> filters = new HashMap<>();
-        if(Objects.equals(responseLogin.getUser().getIdTipoUser(), Constantes.USER_NORMAL)) {
+        if(Objects.equals(responseLogin.getUser().getIdTipoUser(), Constantes.USER_NORMAL_2)) {
             filters.put("userId", responseLogin.getUser().getIdUser());
         } else {
             if(inputData.getIdUser() != null && inputData.getIdUser() > 0) {
@@ -297,13 +298,13 @@ public class DocumentoGeneradoServiceImpl implements DocumentoGeneradoService {
             filters.put("idTipoDocumento", inputData.getIdTipoDocumento());
             responseTotalFiltersDocGenerados.setIdTipoDocumento(inputData.getIdTipoDocumento());
         }
-        if(inputData.getNUnico() != null && inputData.getNUnico() > 0) {
-            filters.put("nUnico", inputData.getNUnico());
-            responseTotalFiltersDocGenerados.setNUnico(inputData.getNUnico());
+        if(inputData.getNumUnico() != null && inputData.getNumUnico() > 0) {
+            filters.put("nUnico", inputData.getNumUnico());
+            responseTotalFiltersDocGenerados.setNumUnico(inputData.getNumUnico());
         }
-        if(inputData.getXFormato() != null && !inputData.getXFormato().isEmpty()) {
-            filters.put("xFormato", inputData.getXFormato());
-            responseTotalFiltersDocGenerados.setXFormato(inputData.getYearExpediente());
+        if(inputData.getXdeFormato() != null && !inputData.getXdeFormato().isEmpty()) {
+            filters.put("xFormato", inputData.getXdeFormato());
+            responseTotalFiltersDocGenerados.setXdeFormato(inputData.getXdeFormato());
         }
         if(inputData.getDniDemandante() != null && !inputData.getDniDemandante().isEmpty()) {
             filters.put("dniDemandante", inputData.getDniDemandante());

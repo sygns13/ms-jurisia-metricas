@@ -36,5 +36,6 @@ public class Constantes {
     public static final Long USER_ADMINISTRADOR = 2L;
     public static final Long USER_NORMAL = 3L;
     public static final Long USER_REPORTES = 4L;
+    public static final Long USER_NORMAL_2 = 5L;
 
 }
