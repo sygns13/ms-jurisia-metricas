@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import pj.gob.pe.metricas.model.entities.CabDocumentoGenerado;
 
+import java.util.List;
 import java.util.Map;
 
 public interface CabDocumentoGeneradoCustomRepo {
@@ -17,4 +18,9 @@ public interface CabDocumentoGeneradoCustomRepo {
     Long getTotalDocGenerados(
             Map<String, Object> filters,
             Map<String, Object> notEqualFilters);
+
+    List<CabDocumentoGenerado> getListGeneralDocumentoGeneradoIA(
+            Map<String, Object> filters,
+            Map<String, Object> notEqualFilters,
+            Map<String, Object> filtersFecha);
 }

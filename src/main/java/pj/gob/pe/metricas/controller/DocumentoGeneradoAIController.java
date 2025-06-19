@@ -15,7 +15,9 @@ import pj.gob.pe.metricas.exception.ModeloNotFoundException;
 import pj.gob.pe.metricas.model.entities.CabDocumentoGenerado;
 import pj.gob.pe.metricas.service.business.DocumentoGeneradoService;
 import pj.gob.pe.metricas.utils.InputDocumentoGeneradoIA;
+import pj.gob.pe.metricas.utils.InputTotalesCabDocGenerado;
 import pj.gob.pe.metricas.utils.ResponseTotalDocGenerados;
+import pj.gob.pe.metricas.utils.ResponseTotalFiltersDocGenerados;
 
 @Tag(name = "Service Metrics Controller", description = "Endpoints de servicio de métricas para Documento Generado IA")
 @RestController
@@ -46,7 +48,7 @@ public class DocumentoGeneradoAIController {
 
     @Operation(summary = "Get Total de  Documento Generado IA", description = "Get de Documento Generado IA")
     @GetMapping("/gettotaloperaciones")
-    public ResponseEntity<ResponseTotalDocGenerados> list(
+    public ResponseEntity<ResponseTotalDocGenerados> listTotal(
             @RequestHeader("SessionId") String SessionId) throws Exception{
 
         String buscar = "";
@@ -62,5 +64,23 @@ public class DocumentoGeneradoAIController {
         responseTotalConversaciones.setTotalDocsGenerados(totalConversaciones);
 
         return new ResponseEntity<>(responseTotalConversaciones, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get Totales de  Documento Generado IA por filters", description = "Get Totales de  Documento Generado IA por filters")
+    @PostMapping("/gettotaloperaciones-filters")
+    public ResponseEntity<ResponseTotalFiltersDocGenerados> listTotalFilters(
+            @RequestHeader("SessionId") String SessionId,
+            @Valid@RequestBody InputTotalesCabDocGenerado inputData) throws Exception{
+
+        String buscar = "";
+
+        ResponseTotalFiltersDocGenerados responseTotalConversacionesFilters = documentoGeneradoService.getTotalDocGeneradosFilters(inputData, SessionId);
+
+        if(responseTotalConversacionesFilters == null) {
+            throw new ModeloNotFoundException("Error de procesamiento de Datos. Comunicarse con un administrador ");
+        }
+
+
+        return new ResponseEntity<>(responseTotalConversacionesFilters, HttpStatus.OK);
     }
 }

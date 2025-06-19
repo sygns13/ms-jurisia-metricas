@@ -190,4 +190,198 @@ public class DocumentoGeneradoServiceImpl implements DocumentoGeneradoService {
 
         return totalElementos;
     }
+
+    @Override
+    public ResponseTotalFiltersDocGenerados getTotalDocGeneradosFilters(InputTotalesCabDocGenerado inputData, String SessionId) throws Exception {
+
+        String errorValidacion = "";
+
+        if(SessionId == null || SessionId.isEmpty()){
+            errorValidacion = "La sessión remitida es inválida";
+            throw new ValidationSessionServiceException(errorValidacion);
+        }
+
+        ResponseLogin responseLogin = securityService.GetSessionData(SessionId);
+
+        if(responseLogin == null || !responseLogin.isSuccess() || !responseLogin.isItemFound() || responseLogin.getUser() == null){
+            errorValidacion = "La sessión remitida es inválida";
+            throw new ValidationSessionServiceException(errorValidacion);
+        }
+
+        ResponseTotalFiltersDocGenerados responseTotalFiltersDocGenerados = new ResponseTotalFiltersDocGenerados();
+        boolean pasaValidacionUsuarios = true;
+
+        Map<String, Object> filters = new HashMap<>();
+        if(Objects.equals(responseLogin.getUser().getIdTipoUser(), Constantes.USER_NORMAL)) {
+            filters.put("userId", responseLogin.getUser().getIdUser());
+        } else {
+            if(inputData.getIdUser() != null && inputData.getIdUser() > 0) {
+                filters.put("userId", inputData.getIdUser());
+            } else{
+                //Consultar por usuarios
+                boolean consultaPorUsuarios = false;
+
+                InputConsultaIAExternal inputConsultaIAExternal = new InputConsultaIAExternal();
+
+                if(inputData.getDocumento() != null && !inputData.getDocumento().isEmpty()) {
+                    consultaPorUsuarios = true;
+                    inputConsultaIAExternal.setDocumento(inputData.getDocumento());
+                }
+                if(inputData.getNombres() != null && !inputData.getNombres().isEmpty()) {
+                    consultaPorUsuarios = true;
+                    inputConsultaIAExternal.setNombres(inputData.getNombres());
+                }
+                if(inputData.getApellidos() != null && !inputData.getApellidos().isEmpty()) {
+                    consultaPorUsuarios = true;
+                    inputConsultaIAExternal.setApellidos(inputData.getApellidos());
+                }
+                if(inputData.getCargo() != null && !inputData.getCargo().isEmpty()) {
+                    consultaPorUsuarios = true;
+                    inputConsultaIAExternal.setCargo(inputData.getCargo());
+                }
+                if(inputData.getUsername() != null && !inputData.getUsername().isEmpty()) {
+                    consultaPorUsuarios = true;
+                    inputConsultaIAExternal.setUsername(inputData.getUsername());
+                }
+                if(inputData.getEmail() != null && !inputData.getEmail().isEmpty()) {
+                    consultaPorUsuarios = true;
+                    inputConsultaIAExternal.setEmail(inputData.getEmail());
+                }
+
+                if(consultaPorUsuarios){
+                    List<OutputConsultaIAExternal> listUsers = securityService.Getusers(inputConsultaIAExternal);
+
+                    if(listUsers == null || listUsers.isEmpty()) {
+                        pasaValidacionUsuarios = false;
+                    }
+
+                    // Agregar los IDs de los usuarios encontrados
+                    filters.put("list_userId", listUsers.stream().map(OutputConsultaIAExternal::getId).toList());
+                }
+            }
+        }
+
+        if(inputData.getTypedoc() != null && !inputData.getTypedoc().isEmpty()) {
+            filters.put("typedoc", inputData.getTypedoc());
+            responseTotalFiltersDocGenerados.setTypedoc(inputData.getTypedoc());
+        }
+        if(inputData.getCodSede() != null && !inputData.getCodSede().isEmpty()) {
+            filters.put("codSede", inputData.getCodSede());
+            responseTotalFiltersDocGenerados.setCodSede(inputData.getCodSede());
+        }
+        if(inputData.getCodInstancia() != null && !inputData.getCodInstancia().isEmpty()) {
+            filters.put("codInstancia", inputData.getCodInstancia());
+            responseTotalFiltersDocGenerados.setCodInstancia(inputData.getCodInstancia());
+        }
+        if(inputData.getCodEspecialidad() != null && !inputData.getCodEspecialidad().isEmpty()) {
+            filters.put("codEspecialidad", inputData.getCodEspecialidad());
+            responseTotalFiltersDocGenerados.setCodEspecialidad(inputData.getCodEspecialidad());
+        }
+        if(inputData.getCodMateria() != null && !inputData.getCodMateria().isEmpty()) {
+            filters.put("codMateria", inputData.getCodMateria());
+            responseTotalFiltersDocGenerados.setCodMateria(inputData.getCodMateria());
+        }
+        if(inputData.getNumeroExpediente() != null && !inputData.getNumeroExpediente().isEmpty()) {
+            filters.put("codNumero", "0".repeat(5 - inputData.getNumeroExpediente().length()) + inputData.getNumeroExpediente());
+            responseTotalFiltersDocGenerados.setNumeroExpediente(inputData.getNumeroExpediente());
+        }
+        if(inputData.getYearExpediente() != null && !inputData.getYearExpediente().isEmpty()) {
+            filters.put("codYear", inputData.getYearExpediente());
+            responseTotalFiltersDocGenerados.setYearExpediente(inputData.getYearExpediente());
+        }
+        if(inputData.getIdDocumento() != null && inputData.getIdDocumento() > 0) {
+            filters.put("idDocumento", inputData.getIdDocumento());
+            responseTotalFiltersDocGenerados.setIdDocumento(inputData.getIdDocumento());
+        }
+        if(inputData.getIdTipoDocumento() != null && inputData.getIdTipoDocumento() > 0) {
+            filters.put("idTipoDocumento", inputData.getIdTipoDocumento());
+            responseTotalFiltersDocGenerados.setIdTipoDocumento(inputData.getIdTipoDocumento());
+        }
+        if(inputData.getNUnico() != null && inputData.getNUnico() > 0) {
+            filters.put("nUnico", inputData.getNUnico());
+            responseTotalFiltersDocGenerados.setNUnico(inputData.getNUnico());
+        }
+        if(inputData.getXFormato() != null && !inputData.getXFormato().isEmpty()) {
+            filters.put("xFormato", inputData.getXFormato());
+            responseTotalFiltersDocGenerados.setXFormato(inputData.getYearExpediente());
+        }
+        if(inputData.getDniDemandante() != null && !inputData.getDniDemandante().isEmpty()) {
+            filters.put("dniDemandante", inputData.getDniDemandante());
+            responseTotalFiltersDocGenerados.setDniDemandante(inputData.getDniDemandante());
+        }
+        if(inputData.getDniDemandado() != null && !inputData.getDniDemandado().isEmpty()) {
+            filters.put("dniDemandado", inputData.getDniDemandado());
+            responseTotalFiltersDocGenerados.setDniDemandado(inputData.getDniDemandado());
+        }
+        if(inputData.getTemplateCode() != null && !inputData.getTemplateCode().isEmpty()) {
+            filters.put("templateCode", inputData.getTemplateCode());
+            responseTotalFiltersDocGenerados.setTemplateCode(inputData.getTemplateCode());
+        }
+        if(inputData.getTemplateID() != null && inputData.getTemplateID() > 0) {
+            filters.put("templateID", inputData.getTemplateID());
+            responseTotalFiltersDocGenerados.setTemplateID(inputData.getTemplateID());
+        }
+
+        if(inputData.getUbicacion() != null && !inputData.getUbicacion().isEmpty()) {
+            filters.put("ubicacion", inputData.getUbicacion());
+            responseTotalFiltersDocGenerados.setUbicacion(inputData.getUbicacion());
+        }
+        if(inputData.getJuez() != null && !inputData.getJuez().isEmpty()) {
+            filters.put("juez", inputData.getJuez());
+            responseTotalFiltersDocGenerados.setJuez(inputData.getJuez());
+        }
+        if(inputData.getEstado() != null && !inputData.getEstado().isEmpty()) {
+            filters.put("estado", inputData.getEstado());
+            responseTotalFiltersDocGenerados.setEstado(inputData.getEstado());
+        }
+        if(inputData.getModel() != null && !inputData.getModel().isEmpty()) {
+            filters.put("model", inputData.getModel());
+            responseTotalFiltersDocGenerados.setModel(inputData.getModel());
+        }
+
+        Map<String, Object> filtersFecha = new HashMap<>();
+        Map<String, Object> filtersNotEquals = new HashMap<>();
+        if(inputData.getFechaInicio() != null && inputData.getFechaFin() != null) {
+            filtersFecha.put("fechaInicio", inputData.getFechaInicio());
+            filtersFecha.put("fechaFin", inputData.getFechaFin());
+        } else if(inputData.getFechaInicio() != null) {
+            filtersFecha.put("fechaInicio", inputData.getFechaInicio());
+        } else if(inputData.getFechaFin() != null) {
+            filtersFecha.put("fechaFin", inputData.getFechaFin());
+        }
+
+        if(!pasaValidacionUsuarios){
+            responseTotalFiltersDocGenerados.setTotalDocsGenerados(0L);
+            return responseTotalFiltersDocGenerados;
+        }
+
+        List<CabDocumentoGenerado> response = cabDocumentoGeneradoDAO.getListGeneralDocumentoGeneradoIA(filters, filtersNotEquals, filtersFecha);
+
+        responseTotalFiltersDocGenerados.setTotalDocsGenerados(response.stream().count());
+
+        if(responseTotalFiltersDocGenerados.getTotalDocsGenerados() > 0L){
+            if(responseTotalFiltersDocGenerados.getCodSede()  != null)
+                responseTotalFiltersDocGenerados.setSede(response.getFirst().getSede());
+
+            if(responseTotalFiltersDocGenerados.getCodInstancia()  != null)
+                responseTotalFiltersDocGenerados.setInstancia(response.getFirst().getInstancia());
+
+            if(responseTotalFiltersDocGenerados.getCodEspecialidad()  != null)
+                responseTotalFiltersDocGenerados.setEspecialidad(response.getFirst().getEspecialidad());
+
+            if(responseTotalFiltersDocGenerados.getCodMateria()  != null)
+                responseTotalFiltersDocGenerados.setMateria(response.getFirst().getMateria());
+
+            if(responseTotalFiltersDocGenerados.getIdDocumento()  != null)
+                responseTotalFiltersDocGenerados.setDocumento(response.getFirst().getDocumento());
+
+            if(responseTotalFiltersDocGenerados.getIdTipoDocumento()  != null)
+                responseTotalFiltersDocGenerados.setTipoDocumento(response.getFirst().getTipoDocumento());
+
+            if(responseTotalFiltersDocGenerados.getTemplateID()  != null || responseTotalFiltersDocGenerados.getTemplateCode()  != null)
+                responseTotalFiltersDocGenerados.setTemplateNombreOut(response.getFirst().getTemplateNombreOut());
+        }
+
+        return responseTotalFiltersDocGenerados;
+    }
 }

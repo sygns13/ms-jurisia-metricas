@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ResponseTotalDocGenerados {
 
-    Long totalDocsGenerados;
+    private Long totalDocsGenerados;
 }

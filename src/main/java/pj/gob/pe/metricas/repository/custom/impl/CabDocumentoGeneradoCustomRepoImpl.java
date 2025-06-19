@@ -67,6 +67,27 @@ public class CabDocumentoGeneradoCustomRepoImpl implements CabDocumentoGeneradoC
         return new PageImpl<>(resultList, pageable, totalElements);
     }
 
+    public List<CabDocumentoGenerado> getListGeneralDocumentoGeneradoIA(
+            Map<String, Object> filters,
+            Map<String, Object> notEqualFilters,
+            Map<String, Object> filtersFecha) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+
+        // Consulta principal para obtener los datos paginados
+        CriteriaQuery<CabDocumentoGenerado> query = cb.createQuery(CabDocumentoGenerado.class);
+        Root<CabDocumentoGenerado> cabDocumentoGenerado = query.from(CabDocumentoGenerado.class);
+
+        // Construir predicados y subconsulta (similar al código anterior)
+        Predicate mainPredicate = buildPredicate(cabDocumentoGenerado, cb, filters, notEqualFilters, filtersFecha);
+
+        query.select(cabDocumentoGenerado).where(mainPredicate);
+
+        // Ejecutar consulta paginada
+        List<CabDocumentoGenerado> resultList = entityManager.createQuery(query).getResultList();
+
+        return resultList;
+    }
+
 
     @Override
     public Long getTotalDocGenerados(
