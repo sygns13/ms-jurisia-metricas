@@ -10,22 +10,30 @@ import pj.gob.pe.metricas.dao.CabDocumentoGeneradoDAO;
 import pj.gob.pe.metricas.exception.ValidationSessionServiceException;
 import pj.gob.pe.metricas.model.entities.CabDocumentoGenerado;
 import pj.gob.pe.metricas.service.business.DocumentoGeneradoService;
+import pj.gob.pe.metricas.service.externals.JudicialService;
 import pj.gob.pe.metricas.service.externals.SecurityService;
 import pj.gob.pe.metricas.utils.*;
 import pj.gob.pe.metricas.utils.inputs.consultaia.InputConsultaIAExternal;
 import pj.gob.pe.metricas.utils.inputs.docgenerados.InputDocumentoGeneradoIA;
+import pj.gob.pe.metricas.utils.inputs.docgenerados.InputMainDocGenerado;
 import pj.gob.pe.metricas.utils.inputs.docgenerados.InputTotalesCabDocGenerado;
 import pj.gob.pe.metricas.utils.responses.consultaia.OutputConsultaIAExternal;
-import pj.gob.pe.metricas.utils.responses.docgenerados.ResponseTotalFiltersDocGenerados;
+import pj.gob.pe.metricas.utils.responses.docgenerados.*;
+import pj.gob.pe.metricas.utils.responses.judicial.DataEspecialidadDTO;
+import pj.gob.pe.metricas.utils.responses.judicial.DataInstanciaDTO;
+import pj.gob.pe.metricas.utils.responses.judicial.Documento;
+import pj.gob.pe.metricas.utils.responses.judicial.TipoDocumento;
 import pj.gob.pe.metricas.utils.responses.security.ResponseLogin;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class DocumentoGeneradoServiceImpl implements DocumentoGeneradoService {
 
     private final SecurityService securityService;
+    private final JudicialService judicialService;
     private final ConfigProperties configProperties;
     private final CabDocumentoGeneradoDAO cabDocumentoGeneradoDAO;
 
@@ -388,5 +396,216 @@ public class DocumentoGeneradoServiceImpl implements DocumentoGeneradoService {
         }
 
         return responseTotalFiltersDocGenerados;
+    }
+
+    @Override
+    public ResponseMainSumarisimo getMainDocumentoGenerado(InputMainDocGenerado inputData, String SessionId) throws Exception {
+        ResponseMainSumarisimo response = new ResponseMainSumarisimo();
+        response.setTotalDoc(0L);
+        response.setTotalWeb(0L);
+
+        List<DataInstanciaDTO> instancias = judicialService.GetInstancias();
+        List<DataEspecialidadDTO> especialidades = judicialService.GetEspecialidades();
+        List<TipoDocumento> tipoDocumentos = judicialService.GetTipoDocumento();
+        List<Documento> documentos = judicialService.GetDocumento();
+
+        if(inputData.getJuez() != null && !inputData.getJuez().isEmpty())
+            response.setJuez(inputData.getJuez());
+        else
+            response.setJuez("Todos");
+
+        if(inputData.getCodInstancia() != null && !inputData.getCodInstancia().isEmpty()){
+            response.setCodInstancia(inputData.getCodInstancia());
+            Optional<DataInstanciaDTO> instanciaOpt = instancias.stream()
+                    .filter(instancia -> instancia.getCodigoInstancia().equals(inputData.getCodInstancia()))
+                    .findFirst();
+            if(instanciaOpt.isPresent()){
+                response.setInstancia(instanciaOpt.get().getInstancia());
+            } else {
+                response.setInstancia("");
+            }
+        }
+        else{
+            response.setCodInstancia("0");
+            response.setInstancia("Todos");
+        }
+
+        Map<String, Object> filters = new HashMap<>();
+        if(inputData.getCodInstancia() != null && !inputData.getCodInstancia().isEmpty()) {
+            filters.put("codInstancia", inputData.getCodInstancia());
+        }
+        if(inputData.getJuez() != null && !inputData.getJuez().isEmpty()) {
+            filters.put("juez", inputData.getJuez());
+        }
+
+        Map<String, Object> filtersFecha = new HashMap<>();
+        if(inputData.getFechaInicio() != null && inputData.getFechaFin() != null) {
+            filtersFecha.put("fechaInicio", inputData.getFechaInicio());
+            filtersFecha.put("fechaFin", inputData.getFechaFin());
+        } else if(inputData.getFechaInicio() != null) {
+            filtersFecha.put("fechaInicio", inputData.getFechaInicio());
+        } else if(inputData.getFechaFin() != null) {
+            filtersFecha.put("fechaFin", inputData.getFechaFin());
+        }
+
+        Map<String, Object> filtersNotEquals = new HashMap<>();
+        List<CabDocumentoGenerado> responseCabDocumentoGenerado = cabDocumentoGeneradoDAO.getListGeneralDocumentoGeneradoIA(filters, filtersNotEquals, filtersFecha);
+
+        response.setTotalDoc(responseCabDocumentoGenerado.stream().filter(doc -> doc.getTypedoc().equals("doc")).count());
+        response.setTotalWeb(responseCabDocumentoGenerado.stream().filter(doc -> doc.getTypedoc().equals("web")).count());
+
+        List<ResponseMainEspecialidad> responseEspecialidades = new ArrayList<>();
+
+        especialidades.forEach(especialidad -> {
+            if(response.getCodInstancia().equals("0") || response.getCodInstancia().equals(especialidad.getCodigoInstancia())){
+                ResponseMainEspecialidad responseMainEspecialidad = new ResponseMainEspecialidad();
+
+                responseMainEspecialidad.setCodEspecialidad(especialidad.getCodigoEspecialidad());
+                responseMainEspecialidad.setEspecialidad(especialidad.getEspecialidad());
+
+                if(response.getCodInstancia().equals("0")){
+                    responseMainEspecialidad.setTotalDoc(responseCabDocumentoGenerado.stream().filter(doc ->
+                                       doc.getTypedoc().equals("doc")
+                                    && doc.getCodEspecialidad().equals(especialidad.getCodigoEspecialidad())).count());
+
+                    responseMainEspecialidad.setTotalWeb(responseCabDocumentoGenerado.stream().filter(doc ->
+                                       doc.getTypedoc().equals("web")
+                                    && doc.getCodEspecialidad().equals(especialidad.getCodigoEspecialidad())).count());
+                } else {
+                    responseMainEspecialidad.setTotalDoc(responseCabDocumentoGenerado.stream().filter(doc ->
+                                       doc.getTypedoc().equals("doc")
+                                    && doc.getCodInstancia().equals(response.getCodInstancia())
+                                    && doc.getCodEspecialidad().equals(especialidad.getCodigoEspecialidad())).count());
+
+                    responseMainEspecialidad.setTotalWeb(responseCabDocumentoGenerado.stream().filter(doc ->
+                                       doc.getTypedoc().equals("web")
+                                    && doc.getCodInstancia().equals(response.getCodInstancia())
+                                    && doc.getCodEspecialidad().equals(especialidad.getCodigoEspecialidad())).count());
+                }
+
+                List<ResponseMainTipoDoc> responseMainTipoDocsInicial = new ArrayList<>();
+
+                tipoDocumentos.forEach(tipoDocumento -> {
+                    if(response.getCodInstancia().equals("0")){
+                        ResponseMainTipoDoc responseMainTipoDoc = new ResponseMainTipoDoc();
+                        responseMainTipoDoc.setIdTipoDocumento(0L);
+                        responseMainTipoDoc.setTipoDocumento(tipoDocumento.getDescripcion());
+
+                        responseMainTipoDocsInicial.add(responseMainTipoDoc);
+                    } else {
+                        if(response.getCodInstancia().equals(tipoDocumento.getIdInstancia())){
+                            ResponseMainTipoDoc responseMainTipoDoc = new ResponseMainTipoDoc();
+                            responseMainTipoDoc.setIdTipoDocumento(tipoDocumento.getIdTipoDocumento());
+                            responseMainTipoDoc.setTipoDocumento(tipoDocumento.getDescripcion());
+
+                            responseMainTipoDocsInicial.add(responseMainTipoDoc);
+                        }
+                    }
+                });
+
+                List<ResponseMainTipoDoc> responseMainTipoDocs = responseMainTipoDocsInicial.stream()
+                        .distinct()
+                        .collect(Collectors.toList());
+
+                responseMainTipoDocs.forEach(responseMainTipoDoc -> {
+
+                    if(response.getCodInstancia().equals("0")){
+                        responseMainTipoDoc.setTotalDoc(responseCabDocumentoGenerado.stream().filter(doc ->
+                                doc.getTypedoc().equals("doc")
+                                        && doc.getCodEspecialidad().equals(especialidad.getCodigoEspecialidad())
+                                        && doc.getTipoDocumento().equals(responseMainTipoDoc.getTipoDocumento())).count());
+
+                        responseMainTipoDoc.setTotalWeb(responseCabDocumentoGenerado.stream().filter(doc ->
+                                doc.getTypedoc().equals("web")
+                                        && doc.getCodEspecialidad().equals(especialidad.getCodigoEspecialidad())
+                                        && doc.getTipoDocumento().equals(responseMainTipoDoc.getTipoDocumento())).count());
+                    } else {
+                        responseMainTipoDoc.setTotalDoc(responseCabDocumentoGenerado.stream().filter(doc ->
+                                           doc.getTypedoc().equals("doc")
+                                        && doc.getCodInstancia().equals(response.getCodInstancia())
+                                        && doc.getCodEspecialidad().equals(especialidad.getCodigoEspecialidad())
+                                        && doc.getIdTipoDocumento().equals(responseMainTipoDoc.getIdTipoDocumento())).count());
+
+                        responseMainTipoDoc.setTotalWeb(responseCabDocumentoGenerado.stream().filter(doc ->
+                                           doc.getTypedoc().equals("web")
+                                        && doc.getCodInstancia().equals(response.getCodInstancia())
+                                        && doc.getCodEspecialidad().equals(especialidad.getCodigoEspecialidad())
+                                        && doc.getIdTipoDocumento().equals(responseMainTipoDoc.getIdTipoDocumento())).count());
+                    }
+
+                    List<ResponseMainDoc> responseMainDocsInicial = new ArrayList<>();
+
+                    documentos.forEach(documento -> {
+                        if(response.getCodInstancia().equals("0")){
+                            tipoDocumentos.forEach(tipoDocumento -> {
+                                if(tipoDocumento.getDescripcion().equals(responseMainTipoDoc.getTipoDocumento())
+                                && tipoDocumento.getIdTipoDocumento().equals(documento.getIdTipoDocumento())) {
+                                    ResponseMainDoc responseMainDoc = new ResponseMainDoc();
+                                    responseMainDoc.setIdDocumento(0L);
+                                    responseMainDoc.setDocumento(documento.getDescripcion());
+
+                                    responseMainDocsInicial.add(responseMainDoc);
+                                }
+
+                            });
+                        } else {
+                            if(responseMainTipoDoc.getTipoDocumento().equals(documento.getIdTipoDocumento())){
+                                ResponseMainDoc responseMainDoc = new ResponseMainDoc();
+                                responseMainDoc.setIdDocumento(documento.getIdDocumento());
+                                responseMainDoc.setDocumento(documento.getDescripcion());
+
+                                responseMainDocsInicial.add(responseMainDoc);
+                            }
+                        }
+                    });
+
+                    List<ResponseMainDoc> responseMainDocs = responseMainDocsInicial.stream()
+                            .distinct()
+                            .collect(Collectors.toList());
+
+                    responseMainDocs.forEach(responseMainDoc -> {
+
+                        if(response.getCodInstancia().equals("0")){
+                            responseMainDoc.setTotalDoc(responseCabDocumentoGenerado.stream().filter(doc ->
+                                    doc.getTypedoc().equals("doc")
+                                            && doc.getCodEspecialidad().equals(especialidad.getCodigoEspecialidad())
+                                            && doc.getTipoDocumento().equals(responseMainTipoDoc.getTipoDocumento())
+                                            && doc.getDocumento().equals(responseMainDoc.getDocumento())).count());
+
+                            responseMainDoc.setTotalWeb(responseCabDocumentoGenerado.stream().filter(doc ->
+                                    doc.getTypedoc().equals("web")
+                                            && doc.getCodEspecialidad().equals(especialidad.getCodigoEspecialidad())
+                                            && doc.getTipoDocumento().equals(responseMainTipoDoc.getTipoDocumento())
+                                            && doc.getDocumento().equals(responseMainDoc.getDocumento())).count());
+                        } else {
+                            responseMainDoc.setTotalDoc(responseCabDocumentoGenerado.stream().filter(doc ->
+                                    doc.getTypedoc().equals("doc")
+                                            && doc.getCodInstancia().equals(response.getCodInstancia())
+                                            && doc.getCodEspecialidad().equals(especialidad.getCodigoEspecialidad())
+                                            && doc.getIdTipoDocumento().equals(responseMainTipoDoc.getIdTipoDocumento())
+                                            && doc.getIdDocumento().equals(responseMainDoc.getIdDocumento())).count());
+
+                            responseMainDoc.setTotalWeb(responseCabDocumentoGenerado.stream().filter(doc ->
+                                    doc.getTypedoc().equals("web")
+                                            && doc.getCodInstancia().equals(response.getCodInstancia())
+                                            && doc.getCodEspecialidad().equals(especialidad.getCodigoEspecialidad())
+                                            && doc.getIdTipoDocumento().equals(responseMainTipoDoc.getIdTipoDocumento())
+                                            && doc.getIdDocumento().equals(responseMainDoc.getIdDocumento())).count());
+                            }
+                        });
+
+                        responseMainTipoDoc.setDocumentos(responseMainDocs);
+                    });
+
+                responseMainEspecialidad.setTipoDocumentos(responseMainTipoDocs);
+                responseEspecialidades.add(responseMainEspecialidad);
+            }
+
+        });
+
+        response.setEspecialidades(responseEspecialidades);
+
+
+        return response;
     }
 }

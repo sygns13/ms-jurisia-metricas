@@ -15,7 +15,9 @@ import pj.gob.pe.metricas.exception.ModeloNotFoundException;
 import pj.gob.pe.metricas.model.entities.CabDocumentoGenerado;
 import pj.gob.pe.metricas.service.business.DocumentoGeneradoService;
 import pj.gob.pe.metricas.utils.inputs.docgenerados.InputDocumentoGeneradoIA;
+import pj.gob.pe.metricas.utils.inputs.docgenerados.InputMainDocGenerado;
 import pj.gob.pe.metricas.utils.inputs.docgenerados.InputTotalesCabDocGenerado;
+import pj.gob.pe.metricas.utils.responses.docgenerados.ResponseMainSumarisimo;
 import pj.gob.pe.metricas.utils.responses.docgenerados.ResponseTotalDocGenerados;
 import pj.gob.pe.metricas.utils.responses.docgenerados.ResponseTotalFiltersDocGenerados;
 
@@ -82,5 +84,23 @@ public class DocumentoGeneradoAIController {
 
 
         return new ResponseEntity<>(responseTotalConversacionesFilters, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get Main Documentos generados", description = "Get Main Documentos generados")
+    @PostMapping("/main")
+    public ResponseEntity<ResponseMainSumarisimo> getMainReportDocGenerados(
+            @RequestHeader("SessionId") String SessionId,
+            @Valid@RequestBody InputMainDocGenerado inputData) throws Exception{
+
+        String buscar = "";
+
+        ResponseMainSumarisimo responseTotalConversacionesFilters = documentoGeneradoService.getMainDocumentoGenerado(inputData, SessionId);
+
+        if(responseTotalConversacionesFilters == null) {
+            throw new ModeloNotFoundException("Error de procesamiento de Datos. Comunicarse con un administrador ");
+        }
+
+
+        return new ResponseEntity<ResponseMainSumarisimo>(responseTotalConversacionesFilters, HttpStatus.OK);
     }
 }

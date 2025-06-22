@@ -1,9 +1,7 @@
 package pj.gob.pe.metricas.utils.responses.docgenerados;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -11,14 +9,15 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResponseMainSumarisimo {
+@ToString
+@EqualsAndHashCode
+public class ResponseMainTipoDoc {
 
-    private String codInstancia;
-    private String instancia;
-    private String juez;
+    private Long idTipoDocumento;
+    private String tipoDocumento;
 
     private Long totalWeb;
     private Long totalDoc;
 
-    private List<ResponseMainEspecialidad> especialidades;
+    private List<ResponseMainDoc> documentos;
 }
