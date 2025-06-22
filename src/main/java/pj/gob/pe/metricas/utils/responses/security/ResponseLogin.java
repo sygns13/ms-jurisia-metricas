@@ -1,4 +1,4 @@
-package pj.gob.pe.metricas.utils;
+package pj.gob.pe.metricas.utils.responses.security;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

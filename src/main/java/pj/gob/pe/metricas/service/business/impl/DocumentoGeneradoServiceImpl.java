@@ -9,12 +9,16 @@ import pj.gob.pe.metricas.configuration.ConfigProperties;
 import pj.gob.pe.metricas.dao.CabDocumentoGeneradoDAO;
 import pj.gob.pe.metricas.exception.ValidationSessionServiceException;
 import pj.gob.pe.metricas.model.entities.CabDocumentoGenerado;
-import pj.gob.pe.metricas.model.entities.CabDocumentoGenerado;
 import pj.gob.pe.metricas.service.business.DocumentoGeneradoService;
 import pj.gob.pe.metricas.service.externals.SecurityService;
 import pj.gob.pe.metricas.utils.*;
+import pj.gob.pe.metricas.utils.inputs.consultaia.InputConsultaIAExternal;
+import pj.gob.pe.metricas.utils.inputs.docgenerados.InputDocumentoGeneradoIA;
+import pj.gob.pe.metricas.utils.inputs.docgenerados.InputTotalesCabDocGenerado;
+import pj.gob.pe.metricas.utils.responses.consultaia.OutputConsultaIAExternal;
+import pj.gob.pe.metricas.utils.responses.docgenerados.ResponseTotalFiltersDocGenerados;
+import pj.gob.pe.metricas.utils.responses.security.ResponseLogin;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 @Service

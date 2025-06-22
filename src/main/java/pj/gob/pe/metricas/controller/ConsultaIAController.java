@@ -15,8 +15,8 @@ import pj.gob.pe.metricas.exception.ModeloNotFoundException;
 import pj.gob.pe.metricas.model.entities.CabConsultaIA;
 import pj.gob.pe.metricas.model.entities.DetailConsultaIA;
 import pj.gob.pe.metricas.service.business.ConsultaIAService;
-import pj.gob.pe.metricas.utils.InputConsultaIA;
-import pj.gob.pe.metricas.utils.InputDetailConsultaIA;
+import pj.gob.pe.metricas.utils.inputs.consultaia.InputConsultaIA;
+import pj.gob.pe.metricas.utils.inputs.consultaia.InputDetailConsultaIA;
 
 @Tag(name = "Service Metrics Controller", description = "Endpoints de servicio de métricas para Consulta IA")
 @RestController

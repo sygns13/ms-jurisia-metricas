@@ -1,6 +1,5 @@
-package pj.gob.pe.metricas.utils;
+package pj.gob.pe.metricas.utils.inputs.docgenerados;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,12 +7,13 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-@Schema(description = "Input Consulta IA Detail Filters")
+@Schema(description = "Input Documento Generado Filters")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InputDetailConsultaIA {
+public class InputDocumentoGeneradoIA {
 
+    //Seccion Usuario
     @Schema(description = "ID de Usuario")
     private Long idUser;
 
@@ -35,15 +35,26 @@ public class InputDetailConsultaIA {
     @Schema(description = "Email de Usuario")
     private String email;
 
+    //Seccion Documento Generado
+    private String typedoc;
+    private String codSede;
+    private String codInstancia;
+    private String codEspecialidad;
+    private String codMateria;
+    private String numeroExpediente;
+    private String yearExpediente;
+    private Long idDocumento;
+    private Long idTipoDocumento;
+    private Long numUnico;
+    private String xdeFormato;
+    private String dniDemandante;
+    private String dniDemandado;
+    private String templateCode;
+    private Long templateID;
+
     @Schema(description = "Fecha de Inicio de Consulta")
     private LocalDate fechaInicio;
 
     @Schema(description = "Fecha F de Consulta")
     private LocalDate fechaFin;
-
-    @Schema(description = "Session de la Conversacion Consulta")
-    private String sessionUID;
-
-    @Schema(description = "Modelo de IA utilizado")
-    private String model;
 }

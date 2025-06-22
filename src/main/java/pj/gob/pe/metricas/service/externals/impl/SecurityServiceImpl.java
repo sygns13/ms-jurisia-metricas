@@ -9,9 +9,9 @@ import org.springframework.web.client.RestClient;
 import pj.gob.pe.metricas.configuration.ConfigProperties;
 import pj.gob.pe.metricas.exception.AuthOpenAIException;
 import pj.gob.pe.metricas.service.externals.SecurityService;
-import pj.gob.pe.metricas.utils.InputConsultaIAExternal;
-import pj.gob.pe.metricas.utils.OutputConsultaIAExternal;
-import pj.gob.pe.metricas.utils.ResponseLogin;
+import pj.gob.pe.metricas.utils.inputs.consultaia.InputConsultaIAExternal;
+import pj.gob.pe.metricas.utils.responses.consultaia.OutputConsultaIAExternal;
+import pj.gob.pe.metricas.utils.responses.security.ResponseLogin;
 
 import java.util.List;
 

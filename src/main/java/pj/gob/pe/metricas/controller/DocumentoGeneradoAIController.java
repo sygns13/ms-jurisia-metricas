@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import pj.gob.pe.metricas.exception.ModeloNotFoundException;
 import pj.gob.pe.metricas.model.entities.CabDocumentoGenerado;
 import pj.gob.pe.metricas.service.business.DocumentoGeneradoService;
-import pj.gob.pe.metricas.utils.InputDocumentoGeneradoIA;
-import pj.gob.pe.metricas.utils.InputTotalesCabDocGenerado;
-import pj.gob.pe.metricas.utils.ResponseTotalDocGenerados;
-import pj.gob.pe.metricas.utils.ResponseTotalFiltersDocGenerados;
+import pj.gob.pe.metricas.utils.inputs.docgenerados.InputDocumentoGeneradoIA;
+import pj.gob.pe.metricas.utils.inputs.docgenerados.InputTotalesCabDocGenerado;
+import pj.gob.pe.metricas.utils.responses.docgenerados.ResponseTotalDocGenerados;
+import pj.gob.pe.metricas.utils.responses.docgenerados.ResponseTotalFiltersDocGenerados;
 
 @Tag(name = "Service Metrics Controller", description = "Endpoints de servicio de métricas para Documento Generado IA")
 @RestController

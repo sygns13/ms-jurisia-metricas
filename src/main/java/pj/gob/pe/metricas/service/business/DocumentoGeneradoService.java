@@ -3,9 +3,9 @@ package pj.gob.pe.metricas.service.business;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import pj.gob.pe.metricas.model.entities.CabDocumentoGenerado;
-import pj.gob.pe.metricas.utils.InputDocumentoGeneradoIA;
-import pj.gob.pe.metricas.utils.InputTotalesCabDocGenerado;
-import pj.gob.pe.metricas.utils.ResponseTotalFiltersDocGenerados;
+import pj.gob.pe.metricas.utils.inputs.docgenerados.InputDocumentoGeneradoIA;
+import pj.gob.pe.metricas.utils.inputs.docgenerados.InputTotalesCabDocGenerado;
+import pj.gob.pe.metricas.utils.responses.docgenerados.ResponseTotalFiltersDocGenerados;
 
 public interface DocumentoGeneradoService {
 

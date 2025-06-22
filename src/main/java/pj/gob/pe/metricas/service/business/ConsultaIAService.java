@@ -5,10 +5,8 @@ import org.springframework.data.domain.Pageable;
 import pj.gob.pe.metricas.model.beans.Completions;
 import pj.gob.pe.metricas.model.entities.CabConsultaIA;
 import pj.gob.pe.metricas.model.entities.DetailConsultaIA;
-import pj.gob.pe.metricas.utils.InputConsultaIA;
-import pj.gob.pe.metricas.utils.InputDetailConsultaIA;
-
-import java.util.Map;
+import pj.gob.pe.metricas.utils.inputs.consultaia.InputConsultaIA;
+import pj.gob.pe.metricas.utils.inputs.consultaia.InputDetailConsultaIA;
 
 public interface ConsultaIAService {
 
