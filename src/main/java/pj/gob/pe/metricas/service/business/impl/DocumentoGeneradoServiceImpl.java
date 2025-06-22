@@ -549,7 +549,7 @@ public class DocumentoGeneradoServiceImpl implements DocumentoGeneradoService {
 
                             });
                         } else {
-                            if(responseMainTipoDoc.getTipoDocumento().equals(documento.getIdTipoDocumento())){
+                            if(responseMainTipoDoc.getIdTipoDocumento().equals(documento.getIdTipoDocumento())){
                                 ResponseMainDoc responseMainDoc = new ResponseMainDoc();
                                 responseMainDoc.setIdDocumento(documento.getIdDocumento());
                                 responseMainDoc.setDocumento(documento.getDescripcion());

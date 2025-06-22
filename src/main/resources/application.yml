@@ -77,10 +77,10 @@ api:
     url: http://localhost:8012
     get:
       instancias:
-        path: v1/instancias/active
+        path: /v1/instancias/all
       especialidades:
-        path: v1/especialidades
+        path: /v1/especialidades/all
       tipodocumentos:
-        path: v1/tipodocumento
+        path: /v1/tipodocumento
       documentos:
-        path: v1/documento
+        path: /v1/documento
