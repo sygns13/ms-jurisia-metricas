@@ -10,10 +10,14 @@ import org.springframework.stereotype.Service;
 import pj.gob.pe.metricas.configuration.ConfigProperties;
 import pj.gob.pe.metricas.dao.CabConsultaIADAO;
 import pj.gob.pe.metricas.dao.DetailConsultaIADAO;
+import pj.gob.pe.metricas.dao.SIJCabConsultaIADAO;
+import pj.gob.pe.metricas.dao.SIJDetailConsultaIADAO;
 import pj.gob.pe.metricas.exception.ValidationSessionServiceException;
 import pj.gob.pe.metricas.model.beans.Completions;
 import pj.gob.pe.metricas.model.entities.CabConsultaIA;
 import pj.gob.pe.metricas.model.entities.DetailConsultaIA;
+import pj.gob.pe.metricas.model.entities.SIJCabConsultaIA;
+import pj.gob.pe.metricas.model.entities.SIJDetailConsultaIA;
 import pj.gob.pe.metricas.service.business.ConsultaIAService;
 import pj.gob.pe.metricas.service.externals.SecurityService;
 import pj.gob.pe.metricas.utils.*;
@@ -35,6 +39,8 @@ public class ConsultaIAServiceImpl implements ConsultaIAService {
     private final ConfigProperties configProperties;
     private final CabConsultaIADAO cabConsultaIADAO;
     private final DetailConsultaIADAO detailConsultaIADAO;
+    private final SIJCabConsultaIADAO sIJCabConsultaIADAO;
+    private final SIJDetailConsultaIADAO sIJDetailConsultaIADAO;
 
     private static final Logger logger = LoggerFactory.getLogger(ConsultaIAServiceImpl.class);
 
@@ -65,6 +71,32 @@ public class ConsultaIAServiceImpl implements ConsultaIAService {
 
             //Guardar la cabecera
             cabConsultaIADAO.registrar(cabConsultaIA);
+
+            //Guardar Data de Sedes e Instancias de Usuarios
+                completions.getSedes().forEach(sede -> {
+                    sede.getInstancias().forEach(instancia -> {
+                        SIJCabConsultaIA sIJCabConsultaIA = new SIJCabConsultaIA();
+
+                        sIJCabConsultaIA.setUserId(completions.getUserId());
+                        sIJCabConsultaIA.setCodSede(sede.getCodSede());
+                        sIJCabConsultaIA.setCodInstancia(instancia.getCodInstancia());
+                        sIJCabConsultaIA.setSede(sede.getSede());
+                        sIJCabConsultaIA.setInstancia(instancia.getInstancia());
+                        sIJCabConsultaIA.setSessionUID(completions.getSessionUID());
+                        sIJCabConsultaIA.setRegDate(fechaActualTime.toLocalDate());
+                        sIJCabConsultaIA.setRegDatetime(fechaActualTime);
+                        sIJCabConsultaIA.setRegTimestamp(fechaActualTime.toEpochSecond(ZoneOffset.UTC));
+
+                        try {
+                            sIJCabConsultaIADAO.registrar(sIJCabConsultaIA);
+                        } catch (Exception e) {
+                            //throw new )RuntimeException(e);
+                            logger.debug(e.getMessage());
+                        }
+                    });
+                });
+
+
         } else {
             //Actualizar la cabecera de la consulta
             completionsExistente.setCountMessages(completionsExistente.getCountMessages() + Constantes.CANTIDAD_UNIDAD_INTEGER);
@@ -115,6 +147,36 @@ public class ConsultaIAServiceImpl implements ConsultaIAService {
         detailConsultaIA.setRegTimestamp(fechaActualTime.toEpochSecond(ZoneOffset.UTC));
 
         detailConsultaIADAO.registrar(detailConsultaIA);
+
+        //Guardar Data de Sedes e Instancias de Usuarios
+            completions.getSedes().forEach(sede -> {
+                sede.getInstancias().forEach(instancia -> {
+                    SIJDetailConsultaIA sIJDetConsultaIA = new SIJDetailConsultaIA();
+
+                    sIJDetConsultaIA.setUserId(completions.getUserId());
+                    sIJDetConsultaIA.setCodSede(sede.getCodSede());
+                    sIJDetConsultaIA.setCodInstancia(instancia.getCodInstancia());
+                    sIJDetConsultaIA.setSede(sede.getSede());
+                    sIJDetConsultaIA.setInstancia(instancia.getInstancia());
+                    sIJDetConsultaIA.setSessionUID(detailConsultaIA.getSessionUID());
+                    sIJDetConsultaIA.setRegDate(fechaActualTime.toLocalDate());
+                    sIJDetConsultaIA.setRegDatetime(fechaActualTime);
+                    sIJDetConsultaIA.setRegTimestamp(fechaActualTime.toEpochSecond(ZoneOffset.UTC));
+
+                    try {
+                        sIJDetailConsultaIADAO.registrar(sIJDetConsultaIA);
+                    } catch (Exception e) {
+                        //throw new RuntimeException(e);
+                        logger.debug(e.getMessage());
+                    }
+                });
+            });
+
+
+        //Guardar la cabecera actualizada
+
+
+
     }
 
     @Override

@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "Entidad que representa la tabla Completions")
 @Data // Lombok: Genera getters, setters, toString, equals, y hashCode
@@ -111,4 +112,6 @@ public class Completions {
 
     @Schema(description = "status de la transaccion", example = "0")
     private Integer status;
+
+    private List<Sedes> sedes;
 }
