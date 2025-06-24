@@ -56,4 +56,8 @@ public class SIJCabConsultaIA {
     @Schema(description = "Epoch de Creación del Registro")
     @Column(name="regTimestamp", nullable = true)
     private Long regTimestamp;
+
+    @OneToOne
+    @JoinColumn(name = "sessionUID", referencedColumnName = "sessionUID", insertable = false, updatable = false)
+    private CabConsultaIA cabConsultaIA;
 }

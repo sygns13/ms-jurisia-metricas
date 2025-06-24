@@ -7,6 +7,9 @@ import pj.gob.pe.metricas.model.entities.SIJCabConsultaIA;
 import pj.gob.pe.metricas.repository.GenericRepo;
 import pj.gob.pe.metricas.repository.SIJCabConsultaIARepo;
 
+import java.util.List;
+import java.util.Map;
+
 @Repository
 @RequiredArgsConstructor
 public class SIJCabConsultaIADAOImpl extends GenericDAOImpl<SIJCabConsultaIA, Long> implements SIJCabConsultaIADAO {
@@ -16,5 +19,10 @@ public class SIJCabConsultaIADAOImpl extends GenericDAOImpl<SIJCabConsultaIA, Lo
     @Override
     protected GenericRepo<SIJCabConsultaIA, Long> getRepo() {
         return repo;
+    }
+
+    @Override
+    public List<SIJCabConsultaIA> getGeneralConsultaIA(Map<String, Object> filters, Map<String, Object> notEqualFilters, Map<String, Object> filtersFecha) {
+        return repo.getGeneralConsultaIA(filters, notEqualFilters, filtersFecha);
     }
 }
