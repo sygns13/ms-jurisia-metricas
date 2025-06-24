@@ -405,9 +405,13 @@ public class DocumentoGeneradoServiceImpl implements DocumentoGeneradoService {
         response.setTotalWeb(0L);
 
         List<DataInstanciaDTO> instancias = judicialService.GetInstancias();
-        List<DataEspecialidadDTO> especialidades = judicialService.GetEspecialidades();
-        List<TipoDocumento> tipoDocumentos = judicialService.GetTipoDocumento();
-        List<Documento> documentos = judicialService.GetDocumento();
+        List<DataEspecialidadDTO> especialidadesAll = judicialService.GetEspecialidades();
+        List<TipoDocumento> tipoDocumentosAll = judicialService.GetTipoDocumento();
+        List<Documento> documentosAll = judicialService.GetDocumento();
+
+        List<DataEspecialidadDTO> especialidades = new ArrayList<>();
+        List<TipoDocumento> tipoDocumentos = new ArrayList<>();
+        List<Documento> documentos = new ArrayList<>();
 
         if(inputData.getJuez() != null && !inputData.getJuez().isEmpty())
             response.setJuez(inputData.getJuez());
@@ -436,6 +440,55 @@ public class DocumentoGeneradoServiceImpl implements DocumentoGeneradoService {
         }
         if(inputData.getJuez() != null && !inputData.getJuez().isEmpty()) {
             filters.put("juez", inputData.getJuez());
+        }
+        if(inputData.getCodEspecialidad() != null && !inputData.getCodEspecialidad().isEmpty()) {
+            filters.put("codEspecialidad", inputData.getCodEspecialidad());
+            especialidadesAll.forEach(especialidad -> {
+                if(inputData.getCodEspecialidad().equals(especialidad.getCodigoEspecialidad())){
+                    DataEspecialidadDTO dataEspecialidadDTO = new DataEspecialidadDTO();
+
+                    dataEspecialidadDTO.setCodigoEspecialidad(especialidad.getCodigoEspecialidad());
+                    dataEspecialidadDTO.setEspecialidad(especialidad.getEspecialidad());
+                    dataEspecialidadDTO.setCodigoInstancia(especialidad.getCodigoInstancia());
+                    dataEspecialidadDTO.setCodigoCodEspecialidad(especialidad.getCodigoCodEspecialidad());
+
+                    especialidades.add(dataEspecialidadDTO);
+                }
+            });
+        } else {
+            especialidades.addAll(especialidadesAll);
+        }
+        if(inputData.getIdTipoDocumento() != null && inputData.getIdTipoDocumento().intValue() > 0) {
+            filters.put("idTipoDocumento", inputData.getIdTipoDocumento());
+            tipoDocumentosAll.forEach(tipoDocumentoAll -> {
+                if(inputData.getIdTipoDocumento().equals(tipoDocumentoAll.getIdTipoDocumento())){
+                    TipoDocumento TipoDocumento = new TipoDocumento();
+
+                    TipoDocumento.setIdTipoDocumento(tipoDocumentoAll.getIdTipoDocumento());
+                    TipoDocumento.setDescripcion(tipoDocumentoAll.getDescripcion());
+                    TipoDocumento.setIdInstancia(tipoDocumentoAll.getIdInstancia());
+
+                    tipoDocumentos.add(TipoDocumento);
+                }
+            });
+        } else {
+            tipoDocumentos.addAll(tipoDocumentosAll);
+        }
+        if(inputData.getIdDocumento() != null && inputData.getIdDocumento().intValue() > 0) {
+            filters.put("idDocumento", inputData.getIdDocumento());
+            documentosAll.forEach(documentoAll -> {
+                if(inputData.getIdDocumento().equals(documentoAll.getIdDocumento())){
+                    Documento documento = new Documento();
+                    documento.setIdDocumento(documentoAll.getIdDocumento());
+                    documento.setIdTipoDocumento(documentoAll.getIdTipoDocumento());
+                    documento.setDescripcion(documentoAll.getDescripcion());
+                    documento.setCodigoTemplate(documentoAll.getCodigoTemplate());
+
+                    documentos.add(documento);
+                }
+            });
+        } else {
+            documentos.addAll(documentosAll);
         }
 
         Map<String, Object> filtersFecha = new HashMap<>();
