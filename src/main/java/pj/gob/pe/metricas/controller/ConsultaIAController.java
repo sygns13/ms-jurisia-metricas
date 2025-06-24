@@ -16,7 +16,13 @@ import pj.gob.pe.metricas.model.entities.CabConsultaIA;
 import pj.gob.pe.metricas.model.entities.DetailConsultaIA;
 import pj.gob.pe.metricas.service.business.ConsultaIAService;
 import pj.gob.pe.metricas.utils.inputs.consultaia.InputConsultaIA;
+import pj.gob.pe.metricas.utils.inputs.consultaia.InputConsultaIAMain1;
+import pj.gob.pe.metricas.utils.inputs.consultaia.InputConsultaIAMain2;
 import pj.gob.pe.metricas.utils.inputs.consultaia.InputDetailConsultaIA;
+import pj.gob.pe.metricas.utils.inputs.docgenerados.InputMainDocGenerado;
+import pj.gob.pe.metricas.utils.responses.consultaia.ResponseConsultaIAMain1;
+import pj.gob.pe.metricas.utils.responses.consultaia.ResponseConsultaIAMain2;
+import pj.gob.pe.metricas.utils.responses.docgenerados.ResponseMainSumarisimo;
 
 @Tag(name = "Service Metrics Controller", description = "Endpoints de servicio de métricas para Consulta IA")
 @RestController
@@ -62,5 +68,37 @@ public class ConsultaIAController {
         }
 
         return new ResponseEntity<Page<DetailConsultaIA>>(dataResponse, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get Main Consulta IA temas", description = "Get Main Consulta IA temas")
+    @PostMapping("/temas")
+    public ResponseEntity<ResponseConsultaIAMain1> getMainReportDocGenerados(
+            @RequestHeader("SessionId") String SessionId,
+            @Valid@RequestBody InputConsultaIAMain1 inputData) throws Exception{
+
+        ResponseConsultaIAMain1 responseConsultaIAMain1 = consultaIAService.getMainConsultaIA1(inputData);
+
+        if(responseConsultaIAMain1 == null) {
+            throw new ModeloNotFoundException("Error de procesamiento de Datos. Comunicarse con un administrador ");
+        }
+
+
+        return new ResponseEntity<ResponseConsultaIAMain1>(responseConsultaIAMain1, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get Main Consulta IA users", description = "Get Main Consulta IA users")
+    @PostMapping("/users")
+    public ResponseEntity<ResponseConsultaIAMain2> getMainReportDocGenerados2(
+            @RequestHeader("SessionId") String SessionId,
+            @Valid@RequestBody InputConsultaIAMain2 inputData) throws Exception{
+
+        ResponseConsultaIAMain2 responseConsultaIAMain2 = consultaIAService.getMainConsultaIA2(inputData);
+
+        if(responseConsultaIAMain2 == null) {
+            throw new ModeloNotFoundException("Error de procesamiento de Datos. Comunicarse con un administrador ");
+        }
+
+
+        return new ResponseEntity<ResponseConsultaIAMain2>(responseConsultaIAMain2, HttpStatus.OK);
     }
 }

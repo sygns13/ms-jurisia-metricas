@@ -26,7 +26,7 @@ public class SIJDetailConsultaIACustomRepoImpl implements SIJDetailConsultaIACus
         Root<SIJDetailConsultaIA> sIJDetailConsultaIA = query.from(SIJDetailConsultaIA.class);
 
         // Hacer JOIN con Dependencia
-        Join<SIJDetailConsultaIA, DetailConsultaIA> detailConsultaIAJoin = sIJDetailConsultaIA.join("cabConsultaIA");
+        Join<SIJDetailConsultaIA, DetailConsultaIA> detailConsultaIAJoin = sIJDetailConsultaIA.join("detailConsultaIA");
 
         // Construir predicados y subconsulta (similar al código anterior)
         Predicate mainPredicate = buildPredicate(sIJDetailConsultaIA, cb, filters, notEqualFilters, filtersFecha);

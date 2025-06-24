@@ -1,9 +1,7 @@
 package pj.gob.pe.metricas.utils.responses.consultaia;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -11,8 +9,11 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
+@EqualsAndHashCode
 public class ResponseMainUsuarios {
 
+    private Long idUser;
     private String documento;
     private String nombres;
     private String apellidos;

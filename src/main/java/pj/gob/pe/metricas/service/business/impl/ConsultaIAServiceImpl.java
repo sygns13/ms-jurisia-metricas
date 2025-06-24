@@ -23,10 +23,8 @@ import pj.gob.pe.metricas.service.externals.JudicialService;
 import pj.gob.pe.metricas.service.externals.SecurityService;
 import pj.gob.pe.metricas.utils.*;
 import pj.gob.pe.metricas.utils.inputs.consultaia.*;
-import pj.gob.pe.metricas.utils.responses.consultaia.OutputConsultaIAExternal;
-import pj.gob.pe.metricas.utils.responses.consultaia.ResponseConsultaIAMain1;
-import pj.gob.pe.metricas.utils.responses.consultaia.ResponseConsultaIAMain2;
-import pj.gob.pe.metricas.utils.responses.consultaia.ResponseMainEspecialidad1;
+import pj.gob.pe.metricas.utils.responses.consultaia.*;
+import pj.gob.pe.metricas.utils.responses.docgenerados.ResponseMainDoc;
 import pj.gob.pe.metricas.utils.responses.judicial.DataEspecialidadDTO;
 import pj.gob.pe.metricas.utils.responses.judicial.DataInstanciaDTO;
 import pj.gob.pe.metricas.utils.responses.security.ResponseLogin;
@@ -35,6 +33,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -152,31 +151,33 @@ public class ConsultaIAServiceImpl implements ConsultaIAService {
         detailConsultaIA.setRegDatetime(fechaActualTime);
         detailConsultaIA.setRegTimestamp(fechaActualTime.toEpochSecond(ZoneOffset.UTC));
 
-        detailConsultaIADAO.registrar(detailConsultaIA);
+        DetailConsultaIA finalDetailConsultaIA = detailConsultaIADAO.registrar(detailConsultaIA);
 
         //Guardar Data de Sedes e Instancias de Usuarios
-            completions.getSedes().forEach(sede -> {
-                sede.getInstancias().forEach(instancia -> {
-                    SIJDetailConsultaIA sIJDetConsultaIA = new SIJDetailConsultaIA();
+        //DetailConsultaIA finalDetailConsultaIA = detailConsultaIA;
+        completions.getSedes().forEach(sede -> {
+            sede.getInstancias().forEach(instancia -> {
+                SIJDetailConsultaIA sIJDetConsultaIA = new SIJDetailConsultaIA();
 
-                    sIJDetConsultaIA.setUserId(completions.getUserId());
-                    sIJDetConsultaIA.setCodSede(sede.getCodSede());
-                    sIJDetConsultaIA.setCodInstancia(instancia.getCodInstancia());
-                    sIJDetConsultaIA.setSede(sede.getSede());
-                    sIJDetConsultaIA.setInstancia(instancia.getInstancia());
-                    sIJDetConsultaIA.setSessionUID(detailConsultaIA.getSessionUID());
-                    sIJDetConsultaIA.setRegDate(fechaActualTime.toLocalDate());
-                    sIJDetConsultaIA.setRegDatetime(fechaActualTime);
-                    sIJDetConsultaIA.setRegTimestamp(fechaActualTime.toEpochSecond(ZoneOffset.UTC));
+                sIJDetConsultaIA.setUserId(completions.getUserId());
+                sIJDetConsultaIA.setDetailConsultaId(finalDetailConsultaIA.getId());
+                sIJDetConsultaIA.setCodSede(sede.getCodSede());
+                sIJDetConsultaIA.setCodInstancia(instancia.getCodInstancia());
+                sIJDetConsultaIA.setSede(sede.getSede());
+                sIJDetConsultaIA.setInstancia(instancia.getInstancia());
+                sIJDetConsultaIA.setSessionUID(finalDetailConsultaIA.getSessionUID());
+                sIJDetConsultaIA.setRegDate(fechaActualTime.toLocalDate());
+                sIJDetConsultaIA.setRegDatetime(fechaActualTime);
+                sIJDetConsultaIA.setRegTimestamp(fechaActualTime.toEpochSecond(ZoneOffset.UTC));
 
-                    try {
-                        sIJDetailConsultaIADAO.registrar(sIJDetConsultaIA);
-                    } catch (Exception e) {
-                        //throw new RuntimeException(e);
-                        logger.debug(e.getMessage());
-                    }
-                });
+                try {
+                    sIJDetailConsultaIADAO.registrar(sIJDetConsultaIA);
+                } catch (Exception e) {
+                    //throw new RuntimeException(e);
+                    logger.debug(e.getMessage());
+                }
             });
+        });
 
 
         //Guardar la cabecera actualizada
@@ -486,6 +487,16 @@ public class ConsultaIAServiceImpl implements ConsultaIAService {
                 response.setConsultas(totalConsultasReal);
             }
         } else{
+            if(inputData.getCodEspecialidad() == null || inputData.getCodEspecialidad().isEmpty()) {
+                ResponseMainEspecialidad1 responseMainEspecialidad1 = new ResponseMainEspecialidad1();
+
+                responseMainEspecialidad1.setCodEspecialidad("0");
+                responseMainEspecialidad1.setEspecialidad("OTROS");
+                responseMainEspecialidad1.setConsultas(0L);
+
+                responseEspecialidades.add(responseMainEspecialidad1);
+            }
+
             response.setConsultas(totalConsultas.get());
         }
 
@@ -496,6 +507,154 @@ public class ConsultaIAServiceImpl implements ConsultaIAService {
 
     @Override
     public ResponseConsultaIAMain2 getMainConsultaIA2(InputConsultaIAMain2 inputData) throws Exception {
-        return null;
+        ResponseConsultaIAMain2 response = new ResponseConsultaIAMain2();
+
+        response.setConsultas(0L);
+
+        List<DataInstanciaDTO> instancias = judicialService.GetInstancias();
+        List<DataEspecialidadDTO> especialidadesAll = judicialService.GetEspecialidades();
+
+        List<DataEspecialidadDTO> especialidades = new ArrayList<>();
+
+        if(inputData.getCodInstancia() != null && !inputData.getCodInstancia().isEmpty()){
+            response.setCodInstancia(inputData.getCodInstancia());
+            Optional<DataInstanciaDTO> instanciaOpt = instancias.stream()
+                    .filter(instancia -> instancia.getCodigoInstancia().equals(inputData.getCodInstancia()))
+                    .findFirst();
+            if(instanciaOpt.isPresent()){
+                response.setInstancia(instanciaOpt.get().getInstancia());
+            } else {
+                response.setInstancia("");
+            }
+        }
+        else{
+            response.setCodInstancia("0");
+            response.setInstancia("Todos");
+        }
+
+        Map<String, Object> filters = new HashMap<>();
+        if(inputData.getCodInstancia() != null && !inputData.getCodInstancia().isEmpty()) {
+            filters.put("codInstancia", inputData.getCodInstancia());
+        }
+        if(inputData.getCodEspecialidad() != null && !inputData.getCodEspecialidad().isEmpty()) {
+            filters.put("codEspecialidad", inputData.getCodEspecialidad());
+            especialidadesAll.forEach(especialidad -> {
+                if(inputData.getCodEspecialidad().equals(especialidad.getCodigoEspecialidad())){
+                    DataEspecialidadDTO dataEspecialidadDTO = new DataEspecialidadDTO();
+
+                    dataEspecialidadDTO.setCodigoEspecialidad(especialidad.getCodigoEspecialidad());
+                    dataEspecialidadDTO.setEspecialidad(especialidad.getEspecialidad());
+                    dataEspecialidadDTO.setCodigoInstancia(especialidad.getCodigoInstancia());
+                    dataEspecialidadDTO.setCodigoCodEspecialidad(especialidad.getCodigoCodEspecialidad());
+
+                    especialidades.add(dataEspecialidadDTO);
+                }
+            });
+        } else {
+            especialidades.addAll(especialidadesAll);
+        }
+        if(inputData.getIdUser() != null && inputData.getIdUser() > 0) {
+            filters.put("userId", inputData.getIdUser());
+        }
+
+        Map<String, Object> filtersFecha = new HashMap<>();
+        if(inputData.getFechaInicio() != null && inputData.getFechaFin() != null) {
+            filtersFecha.put("fechaInicio", inputData.getFechaInicio());
+            filtersFecha.put("fechaFin", inputData.getFechaFin());
+        } else if(inputData.getFechaInicio() != null) {
+            filtersFecha.put("fechaInicio", inputData.getFechaInicio());
+        } else if(inputData.getFechaFin() != null) {
+            filtersFecha.put("fechaFin", inputData.getFechaFin());
+        }
+
+        Map<String, Object> filtersNotEquals = new HashMap<>();
+        List<SIJDetailConsultaIA> sIJDetailConsultaIA = sIJDetailConsultaIADAO.getDetailConsultaIA(filters, filtersNotEquals, filtersFecha);
+        AtomicReference<Long> totalConsultas = new AtomicReference<>(0L);
+
+
+        List<ResponseMainUsuarios> responseMainUsuariosAll = new ArrayList<>();
+        sIJDetailConsultaIA.forEach(consulta -> {
+            ResponseMainUsuarios responseMainUsuario = new ResponseMainUsuarios();
+            responseMainUsuario.setIdUser(consulta.getUserId());
+
+            responseMainUsuariosAll.add(responseMainUsuario);
+        });
+
+        List<ResponseMainUsuarios> responseMainUsuarios = responseMainUsuariosAll.stream()
+                .distinct()
+                .collect(Collectors.toList());
+
+        List<ResponseMainEspecialidad1> responseEspecialidades = new ArrayList<>();
+
+        responseMainUsuarios.forEach(usuario -> {
+            AtomicReference<Long> totalConsultasusuario = new AtomicReference<>(0L);
+            usuario.setConsultas(sIJDetailConsultaIA.stream().filter(consulta ->
+                    consulta.getUserId().equals(usuario.getIdUser())
+            ).count());
+
+            especialidades.forEach(especialidad -> {
+                if(response.getCodInstancia().equals("0") || response.getCodInstancia().equals(especialidad.getCodigoInstancia())){
+                    ResponseMainEspecialidad1 responseMainEspecialidad1 = new ResponseMainEspecialidad1();
+
+                    responseMainEspecialidad1.setCodEspecialidad(especialidad.getCodigoEspecialidad());
+                    responseMainEspecialidad1.setEspecialidad(especialidad.getEspecialidad());
+
+                    if(response.getCodInstancia().equals("0")) {
+                        responseMainEspecialidad1.setConsultas(sIJDetailConsultaIA.stream().filter(consulta ->
+                                consulta.getUserId().equals(usuario.getIdUser()) && (
+                                consulta.getDetailConsultaIA().getSendMessage().toLowerCase().contains(especialidad.getEspecialidad().toLowerCase()) ||
+                                consulta.getDetailConsultaIA().getResponseMessage().toLowerCase().contains(especialidad.getEspecialidad().toLowerCase())
+                                )
+                        ).count());
+                    } else {
+                        responseMainEspecialidad1.setConsultas(sIJDetailConsultaIA.stream().filter(consulta ->
+                                consulta.getUserId().equals(usuario.getIdUser()) && (
+                                consulta.getCodInstancia().equals(response.getCodInstancia()) && (
+                                        consulta.getDetailConsultaIA().getSendMessage().toLowerCase().contains(especialidad.getEspecialidad().toLowerCase()) ||
+                                        consulta.getDetailConsultaIA().getResponseMessage().toLowerCase().contains(especialidad.getEspecialidad().toLowerCase())
+                                        )
+                                )
+                        ).count());
+                    }
+
+                    responseEspecialidades.add(responseMainEspecialidad1);
+                    totalConsultasusuario.set(totalConsultasusuario.get() + responseMainEspecialidad1.getConsultas());
+                }
+            });
+
+            if(usuario.getConsultas() > totalConsultasusuario.get()){
+                if(inputData.getCodEspecialidad() != null && !inputData.getCodEspecialidad().isEmpty()) {
+                    response.setConsultas(totalConsultas.get());
+                } else {
+                    ResponseMainEspecialidad1 responseMainEspecialidad1 = new ResponseMainEspecialidad1();
+
+                    responseMainEspecialidad1.setCodEspecialidad("0");
+                    responseMainEspecialidad1.setEspecialidad("OTROS");
+                    responseMainEspecialidad1.setConsultas(usuario.getConsultas() - totalConsultasusuario.get());
+
+                    responseEspecialidades.add(responseMainEspecialidad1);
+                }
+            } else{
+                if(inputData.getCodEspecialidad() == null || inputData.getCodEspecialidad().isEmpty()) {
+                    ResponseMainEspecialidad1 responseMainEspecialidad1 = new ResponseMainEspecialidad1();
+
+                    responseMainEspecialidad1.setCodEspecialidad("0");
+                    responseMainEspecialidad1.setEspecialidad("OTROS");
+                    responseMainEspecialidad1.setConsultas(0L);
+
+                    responseEspecialidades.add(responseMainEspecialidad1);
+                }
+                usuario.setConsultas(totalConsultasusuario.get());
+            }
+            usuario.setEspecialidades(responseEspecialidades);
+
+            totalConsultas.set(totalConsultas.get() + usuario.getConsultas());
+        });
+
+        response.setConsultas(totalConsultas.get());
+
+        response.setUsuarios(responseMainUsuarios);
+
+        return response;
     }
 }

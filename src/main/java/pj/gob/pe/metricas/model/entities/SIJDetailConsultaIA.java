@@ -27,6 +27,10 @@ public class SIJDetailConsultaIA {
     @Schema(description = "ID del usuario", example = "12345")
     private Long userId;
 
+    @Column(name = "detailConsultaId")
+    @Schema(description = "ID del Detalle de Consulta IA", example = "12345")
+    private Long detailConsultaId;
+
     @Column(name = "codSede", length = 20)
     private String codSede;
 
@@ -58,6 +62,6 @@ public class SIJDetailConsultaIA {
     private Long regTimestamp;
 
     @OneToOne
-    @JoinColumn(name = "sessionUID", referencedColumnName = "sessionUID", insertable = false, updatable = false)
+    @JoinColumn(name = "detailConsultaId", referencedColumnName = "id", insertable = false, updatable = false)
     private DetailConsultaIA detailConsultaIA;
 }

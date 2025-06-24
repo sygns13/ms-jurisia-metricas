@@ -28,6 +28,7 @@ ALTER TABLE JURISDB_METRICS.SIJCabConsultaIA
 CREATE TABLE If Not Exists JURISDB_METRICS.SIJDetailConsultaIA (
   id bigint unsigned primary key not null auto_increment,
   userId bigint DEFAULT NULL Comment 'ID de Usuario',
+  detailConsultaId bigint DEFAULT NULL Comment 'ID de Detalle de Consulta IA',
   codSede char(20) DEFAULT NULL Comment 'Codigo de Sede en el SIJ',
   codInstancia char(20) DEFAULT NULL Comment 'Codigo de Instancia en el SIJ',
   sede char(200) DEFAULT NULL Comment 'Nombre de Sede en el SIJ',
@@ -44,6 +45,7 @@ COMMENT = 'Tabla de enlace de la Cabecera de Consultas a la IA (Inteligencia Art
 -- Indexacion
 ALTER TABLE JURISDB_METRICS.SIJDetailConsultaIA
     ADD INDEX sij_userIdIDX (userId),
+    ADD INDEX sij_detailConsultaIdIDX (detailConsultaId),
     ADD INDEX sij_codSedeIDX (codSede),
     ADD INDEX sij_codInstanciaIDX (codInstancia),
     ADD INDEX sij_sessionUIDIDX (sessionUID),
