@@ -402,7 +402,7 @@ public class ConsultaIAServiceImpl implements ConsultaIAService {
             filters.put("codInstancia", inputData.getCodInstancia());
         }
         if(inputData.getCodEspecialidad() != null && !inputData.getCodEspecialidad().isEmpty()) {
-            filters.put("codEspecialidad", inputData.getCodEspecialidad());
+            //filters.put("codEspecialidad", inputData.getCodEspecialidad());
             especialidadesAll.forEach(especialidad -> {
                 if(inputData.getCodEspecialidad().equals(especialidad.getCodigoEspecialidad())){
                     DataEspecialidadDTO dataEspecialidadDTO = new DataEspecialidadDTO();
@@ -555,7 +555,7 @@ public class ConsultaIAServiceImpl implements ConsultaIAService {
             filters.put("codInstancia", inputData.getCodInstancia());
         }
         if(inputData.getCodEspecialidad() != null && !inputData.getCodEspecialidad().isEmpty()) {
-            filters.put("codEspecialidad", inputData.getCodEspecialidad());
+            //filters.put("codEspecialidad", inputData.getCodEspecialidad());
             especialidadesAll.forEach(especialidad -> {
                 if(inputData.getCodEspecialidad().equals(especialidad.getCodigoEspecialidad())){
                     DataEspecialidadDTO dataEspecialidadDTO = new DataEspecialidadDTO();
