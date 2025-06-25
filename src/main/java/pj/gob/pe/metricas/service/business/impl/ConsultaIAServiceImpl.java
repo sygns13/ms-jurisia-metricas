@@ -23,11 +23,13 @@ import pj.gob.pe.metricas.service.externals.JudicialService;
 import pj.gob.pe.metricas.service.externals.SecurityService;
 import pj.gob.pe.metricas.utils.*;
 import pj.gob.pe.metricas.utils.inputs.consultaia.*;
+import pj.gob.pe.metricas.utils.inputs.security.UserIdsRequest;
 import pj.gob.pe.metricas.utils.responses.consultaia.*;
 import pj.gob.pe.metricas.utils.responses.docgenerados.ResponseMainDoc;
 import pj.gob.pe.metricas.utils.responses.judicial.DataEspecialidadDTO;
 import pj.gob.pe.metricas.utils.responses.judicial.DataInstanciaDTO;
 import pj.gob.pe.metricas.utils.responses.security.ResponseLogin;
+import pj.gob.pe.metricas.utils.responses.security.User;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -418,6 +420,22 @@ public class ConsultaIAServiceImpl implements ConsultaIAService {
         }
         if(inputData.getIdUser() != null && inputData.getIdUser() > 0) {
             filters.put("userId", inputData.getIdUser());
+
+            UserIdsRequest userIdsRequest = new UserIdsRequest();
+            List<Long> idUsers = new ArrayList<>();
+            idUsers.add(inputData.getIdUser());
+            userIdsRequest.setIdUsers(idUsers);
+
+            List<User> users = securityService.GetListUsers(userIdsRequest);
+
+            if(users != null && !users.isEmpty()){
+                response.setDocumento(users.get(0).getDocumento());
+                response.setNombres(users.get(0).getNombres());
+                response.setApellidos(users.get(0).getApellidos());
+                response.setUsername(users.get(0).getUsername());
+                response.setCargoUsuario(users.get(0).getCargo());
+            }
+
         } else{
             response.setIdUser(0L);
             response.setNombres("Todos");
@@ -584,9 +602,29 @@ public class ConsultaIAServiceImpl implements ConsultaIAService {
                 .distinct()
                 .collect(Collectors.toList());
 
+        UserIdsRequest userIdsRequest = new UserIdsRequest();
+        List<Long> idUsers = responseMainUsuarios.stream()
+                .map(user -> user.getIdUser())
+                .toList();
+        userIdsRequest.setIdUsers(idUsers);
+
+        List<User> users = securityService.GetListUsers(userIdsRequest);
         List<ResponseMainEspecialidad1> responseEspecialidades = new ArrayList<>();
 
         responseMainUsuarios.forEach(usuario -> {
+
+            if(users != null && !users.isEmpty()) {
+                users.forEach(user -> {
+                    if (usuario.getIdUser().equals(user.getId())) {
+                        usuario.setDocumento(user.getDocumento());
+                        usuario.setNombres(user.getNombres());
+                        usuario.setApellidos(user.getApellidos());
+                        usuario.setUsername(user.getUsername());
+                        usuario.setCargoUsuario(user.getCargo());
+                    }
+                });
+            }
+
             AtomicReference<Long> totalConsultasusuario = new AtomicReference<>(0L);
             usuario.setConsultas(sIJDetailConsultaIA.stream().filter(consulta ->
                     consulta.getUserId().equals(usuario.getIdUser())

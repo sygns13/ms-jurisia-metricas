@@ -23,6 +23,9 @@ public class ConfigProperties {
     @Value("${api.security.get.users.path}")
     private String pathGetUsers;
 
+    @Value("${api.security.get.listusers.path}")
+    private String pathGetListUsers;
+
     @Value("${spring.data.redis.prefix:jurisia_metrics}")
     private String REDIS_KEY_PREFIX;
 

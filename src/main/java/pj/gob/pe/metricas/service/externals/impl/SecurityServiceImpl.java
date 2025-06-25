@@ -10,8 +10,10 @@ import pj.gob.pe.metricas.configuration.ConfigProperties;
 import pj.gob.pe.metricas.exception.AuthOpenAIException;
 import pj.gob.pe.metricas.service.externals.SecurityService;
 import pj.gob.pe.metricas.utils.inputs.consultaia.InputConsultaIAExternal;
+import pj.gob.pe.metricas.utils.inputs.security.UserIdsRequest;
 import pj.gob.pe.metricas.utils.responses.consultaia.OutputConsultaIAExternal;
 import pj.gob.pe.metricas.utils.responses.security.ResponseLogin;
+import pj.gob.pe.metricas.utils.responses.security.User;
 
 import java.util.List;
 
@@ -50,10 +52,10 @@ public class SecurityServiceImpl implements SecurityService {
     @Override
     public List<OutputConsultaIAExternal> Getusers(InputConsultaIAExternal inputConsultaIAExternal) {
 
-        String pathSession = properties.getPathGetUsers();
+        String pathGetUsers = properties.getPathGetUsers();
 
         return restClient.post()
-                .uri(pathSession)
+                .uri(pathGetUsers)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(inputConsultaIAExternal) // Enviar objeto como JSON
                 .retrieve()
@@ -64,5 +66,24 @@ public class SecurityServiceImpl implements SecurityService {
                     throw new RuntimeException("Error del servidor, Comunicarse con el administrador");
                 })
                 .body(new ParameterizedTypeReference<List<OutputConsultaIAExternal>>() {});
+    }
+
+    @Override
+    public List<User> GetListUsers(UserIdsRequest userIdsRequest) {
+
+        String pathGetListUsers = properties.getPathGetListUsers();
+
+        return restClient.post()
+                .uri(pathGetListUsers)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .body(userIdsRequest) // Enviar objeto como JSON
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+                    throw new AuthOpenAIException("Credenciales de Sessión Expirada");
+                })
+                .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
+                    throw new RuntimeException("Error del servidor, Comunicarse con el administrador");
+                })
+                .body(new ParameterizedTypeReference<List<User>>() {});
     }
 }
