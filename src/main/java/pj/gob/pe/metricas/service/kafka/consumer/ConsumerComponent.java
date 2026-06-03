@@ -8,7 +8,9 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 import pj.gob.pe.metricas.model.beans.Completions;
 import pj.gob.pe.metricas.model.entities.CabDocumentoGenerado;
+import pj.gob.pe.metricas.model.entities.DemandasCalificadasToKafka;
 import pj.gob.pe.metricas.service.business.ConsultaIAService;
+import pj.gob.pe.metricas.service.business.DemandasCalificadasService;
 import pj.gob.pe.metricas.service.business.DocumentoGeneradoService;
 
 
@@ -20,6 +22,7 @@ public class ConsumerComponent {
 
     private final ConsultaIAService consultaIAService;
     private final DocumentoGeneradoService documentoGeneradoService;
+    private final DemandasCalificadasService demandasCalificadasService;
 
     @KafkaListener(
             topics = "judicial-metrics",
@@ -66,5 +69,24 @@ public class ConsumerComponent {
 //                "Mensaje [%s] recibido con key [%s] de la partición %d @ %d",
 //                message.toString(), key, partition, timestamp
 //        ));
+    }
+
+
+    @KafkaListener(
+            topics = "judicial-metrics-califications",
+            groupId = "${spring.kafka.consumer.group-id}",
+            containerFactory = "demandasCalificadasKafkaListenerFactory"
+    )
+    public void receiveDemandaCalificada(
+            @Payload DemandasCalificadasToKafka message,
+            @Header(KafkaHeaders.RECEIVED_KEY) String key,
+            @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
+            @Header(KafkaHeaders.RECEIVED_TIMESTAMP) long timestamp
+    ) throws Exception {
+        System.out.println(String.format(
+                "Mensaje [%s] recibido con key [%s] de la partición %d @ %d",
+                message.toString(), key, partition, timestamp
+        ));
+        this.demandasCalificadasService.RegistrarDemandaCalificada(message);
     }
 }

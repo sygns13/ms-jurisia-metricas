@@ -13,6 +13,7 @@ import org.springframework.kafka.support.mapping.Jackson2JavaTypeMapper;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import pj.gob.pe.metricas.model.beans.Completions;
 import pj.gob.pe.metricas.model.entities.CabDocumentoGenerado;
+import pj.gob.pe.metricas.model.entities.DemandasCalificadasToKafka;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,10 +41,15 @@ public class KafkaConsumerConfig {
                 "pj.gob.pe.judicial.model.beans.CabDocumentoGenerado",
                 pj.gob.pe.metricas.model.entities.CabDocumentoGenerado.class
         );
+
+        idToClazz.put(
+                "pj.gob.pe.consultaia.model.beans.DemandasCalificadasToKafka",
+                pj.gob.pe.metricas.model.entities.DemandasCalificadasToKafka.class
+        );
         mapper.setIdClassMapping(idToClazz);
 
         // confía en cualquier paquete o en los específicos
-        mapper.addTrustedPackages("pj.gob.pe.metricas.model.beans");
+        mapper.addTrustedPackages("pj.gob.pe.metricas.model.beans", "pj.gob.pe.metricas.model.entities");
         return mapper;
     }
 
@@ -95,6 +101,32 @@ public class KafkaConsumerConfig {
     public ConcurrentKafkaListenerContainerFactory<String, CabDocumentoGenerado> auditKafkaListenerFactory() {
         var factory = new ConcurrentKafkaListenerContainerFactory<String, CabDocumentoGenerado>();
         factory.setConsumerFactory(documentoGeneradoFactory());
+        return factory;
+    }
+
+    //----------------------------------------
+    // ConsumerFactory + ListenerFactory para DemandasCalificadasToKafka
+
+    @Bean
+    public ConsumerFactory<String, DemandasCalificadasToKafka> demandasCalificadasFactory() {
+        JsonDeserializer<DemandasCalificadasToKafka> deserializer = new JsonDeserializer<>(DemandasCalificadasToKafka.class);
+        deserializer.setTypeMapper(typeMapper());
+        deserializer.addTrustedPackages("pj.gob.pe.metricas.model.entities", "pj.gob.pe.consultaia.model.beans");
+
+        Map<String, Object> props = Map.of(
+                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP,
+                ConsumerConfig.GROUP_ID_CONFIG, kafkaConsumerGroupId,
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, deserializer
+        );
+
+        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, DemandasCalificadasToKafka> demandasCalificadasKafkaListenerFactory() {
+        var factory = new ConcurrentKafkaListenerContainerFactory<String, DemandasCalificadasToKafka>();
+        factory.setConsumerFactory(demandasCalificadasFactory());
         return factory;
     }
 
