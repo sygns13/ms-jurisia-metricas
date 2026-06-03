@@ -14,6 +14,9 @@ public class DemandasCalificadasServiceImpl implements DemandasCalificadasServic
 
     @Override
     public void RegistrarDemandaCalificada(DemandasCalificadasToKafka demandasCalificadasToKafka) throws Exception {
+        // El mensaje llega con el id de consultaia; se descarta para que la BD de métricas
+        // genere su propio id (AUTO_INCREMENT) y la operación sea un INSERT (no un merge/update).
+        demandasCalificadasToKafka.setId(null);
         this.demandasCalificadasToKafkaDAO.registrar(demandasCalificadasToKafka);
     }
 }
