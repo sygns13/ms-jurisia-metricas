@@ -109,7 +109,7 @@ public class DemandasCalificadasToKafka {
     @Column(name = "xdescUbicacion", length = 100)
     private String xdescUbicacion;
 
-    @Column(name = "xnombreArchivo", length = 100)
+    @Column(name = "xnombreArchivo", length = 500)
     private String xnombreArchivo;
 
     @Column(name = "nincidente", length = 20)
