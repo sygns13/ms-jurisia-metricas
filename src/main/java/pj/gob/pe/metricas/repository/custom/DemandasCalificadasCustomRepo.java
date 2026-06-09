@@ -1,4 +1,4 @@
-package pj.gob.pe.metricas.dao;
+package pj.gob.pe.metricas.repository.custom;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -6,7 +6,7 @@ import pj.gob.pe.metricas.model.entities.DemandasCalificadasToKafka;
 
 import java.util.Map;
 
-public interface DemandasCalificadasToKafkaDAO extends GenericDAO<DemandasCalificadasToKafka, Long> {
+public interface DemandasCalificadasCustomRepo {
 
     Page<DemandasCalificadasToKafka> getGeneralDemandasCalificadas(
             Map<String, Object> filters,
