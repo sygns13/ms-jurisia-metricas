@@ -7,7 +7,7 @@ CREATE TABLE `JURISDB_METRICS`.`DemandasSentencias` (
                                                         `temperature` decimal(3,1) DEFAULT NULL,
                                                         `fechaSend` datetime DEFAULT NULL,
                                                         `fechaResponse` datetime DEFAULT NULL,
-                                                        `response` text,
+                                                        `response` mediumtext,
                                                         `timeSeconds` double DEFAULT NULL,
                                                         `ConfigurationsId` int NOT NULL,
                                                         `status` tinyint DEFAULT NULL,

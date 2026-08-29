@@ -55,7 +55,7 @@ public class DemandasSentenciasToKafka {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime fechaResponse;
 
-    @Column(name = "response", columnDefinition = "TEXT")
+    @Column(name = "response", columnDefinition = "MEDIUMTEXT")
     private String response;
 
     @Column(name = "timeSeconds")
