@@ -42,6 +42,7 @@ public class ValidacionAdministrador {
 
         if(!Objects.equals(idTipoUser, Constantes.USER_SUPER_ADMINISTRADOR)
                 && !Objects.equals(idTipoUser, Constantes.USER_ADMINISTRADOR)
+                && !Objects.equals(idTipoUser, Constantes.USER_NORMAL)
                 && !Objects.equals(idTipoUser, Constantes.USER_REPORTES)) {
             throw new AccesoDenegadoException("El usuario no tiene permisos para acceder a los reportes de administrador");
         }
