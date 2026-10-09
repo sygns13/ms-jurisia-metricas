@@ -16,6 +16,12 @@ import pj.gob.pe.metricas.exception.ValidationSessionServiceException;
 import pj.gob.pe.metricas.model.beans.DocumentoPlantillaGeneradoToKafka;
 import pj.gob.pe.metricas.model.beans.VariableDocumentoToKafka;
 import pj.gob.pe.metricas.model.entities.CabDocumentoPlantillaGenerado;
+import pj.gob.pe.metricas.utils.inputs.docplantillaadmin.InputAdminDocPlantillaDetalle;
+import pj.gob.pe.metricas.utils.inputs.docplantillaadmin.InputAdminDocPlantillaFiltros;
+import pj.gob.pe.metricas.utils.inputs.docplantillaadmin.InputAdminDocPlantillaPorInstancia;
+import pj.gob.pe.metricas.utils.responses.docplantillaadmin.ResponseAdminDocPlantillaPorDocumento;
+import pj.gob.pe.metricas.utils.responses.docplantillaadmin.ResponseAdminDocPlantillaPorExpediente;
+import pj.gob.pe.metricas.utils.responses.docplantillaadmin.ResponseAdminDocPlantillaPorInstancia;
 import pj.gob.pe.metricas.model.entities.DetDocumentoPlantillaVariable;
 import pj.gob.pe.metricas.service.business.DocumentoPlantillaGeneradoService;
 import pj.gob.pe.metricas.service.externals.SecurityService;
@@ -61,6 +67,7 @@ public class DocumentoPlantillaGeneradoServiceImpl implements DocumentoPlantilla
     private final CabDocumentoPlantillaGeneradoDAO cabDocumentoPlantillaGeneradoDAO;
     private final DetDocumentoPlantillaVariableDAO detDocumentoPlantillaVariableDAO;
     private final SecurityService securityService;
+    private final ValidacionAdministrador validacionAdministrador;
 
     // ====================================================================
     // Registro desde Kafka
@@ -195,6 +202,38 @@ public class DocumentoPlantillaGeneradoServiceImpl implements DocumentoPlantilla
         r.setPorUsuario(agrupar(datos, d -> String.valueOf(d.getUserId()), CabDocumentoPlantillaGenerado::getNombreUsuario));
 
         return r;
+    }
+
+    // ====================================================================
+    // Reportes de administrador
+    // ====================================================================
+
+    @Override
+    public Page<ResponseAdminDocPlantillaPorInstancia> reporteAdminPorInstancia(String SessionId, InputAdminDocPlantillaPorInstancia input, Pageable pageable) {
+        validacionAdministrador.validarSesionAdministrador(SessionId);
+        validacionAdministrador.validarRangoFechas(input.getFechaInicial(), input.getFechaFinal());
+        return cabDocumentoPlantillaGeneradoDAO.reporteAdminPorInstancia(input, pageable);
+    }
+
+    @Override
+    public Page<ResponseAdminDocPlantillaPorExpediente> reporteAdminPorExpediente(String SessionId, InputAdminDocPlantillaFiltros input, Pageable pageable) {
+        validacionAdministrador.validarSesionAdministrador(SessionId);
+        validacionAdministrador.validarRangoFechas(input.getFechaInicial(), input.getFechaFinal());
+        return cabDocumentoPlantillaGeneradoDAO.reporteAdminPorExpediente(input, pageable);
+    }
+
+    @Override
+    public Page<ResponseAdminDocPlantillaPorDocumento> reporteAdminPorDocumento(String SessionId, InputAdminDocPlantillaFiltros input, Pageable pageable) {
+        validacionAdministrador.validarSesionAdministrador(SessionId);
+        validacionAdministrador.validarRangoFechas(input.getFechaInicial(), input.getFechaFinal());
+        return cabDocumentoPlantillaGeneradoDAO.reporteAdminPorDocumento(input, pageable);
+    }
+
+    @Override
+    public Page<CabDocumentoPlantillaGenerado> detalleAdmin(String SessionId, InputAdminDocPlantillaDetalle input, Pageable pageable) {
+        validacionAdministrador.validarSesionAdministrador(SessionId);
+        validacionAdministrador.validarRangoFechas(input.getFechaInicial(), input.getFechaFinal());
+        return cabDocumentoPlantillaGeneradoDAO.detalleAdmin(input, pageable);
     }
 
     // ====================================================================

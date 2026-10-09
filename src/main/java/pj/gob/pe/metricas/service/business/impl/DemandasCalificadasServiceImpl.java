@@ -7,6 +7,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import pj.gob.pe.metricas.dao.DemandasCalificadasToKafkaDAO;
 import pj.gob.pe.metricas.exception.ValidationSessionServiceException;
+import pj.gob.pe.metricas.utils.inputs.demandasadmin.InputAdminDemandasPorExpediente;
+import pj.gob.pe.metricas.utils.inputs.demandasadmin.InputAdminDemandasPorInstancia;
+import pj.gob.pe.metricas.utils.responses.demandasadmin.ResponseAdminDemandasPorExpediente;
+import pj.gob.pe.metricas.utils.responses.demandasadmin.ResponseAdminDemandasPorInstancia;
 import pj.gob.pe.metricas.model.entities.DemandasCalificadasToKafka;
 import pj.gob.pe.metricas.service.business.DemandasCalificadasService;
 import pj.gob.pe.metricas.service.externals.SecurityService;
@@ -27,6 +31,7 @@ import java.util.Objects;
 public class DemandasCalificadasServiceImpl implements DemandasCalificadasService {
 
     private final SecurityService securityService;
+    private final ValidacionAdministrador validacionAdministrador;
     private final DemandasCalificadasToKafkaDAO demandasCalificadasToKafkaDAO;
 
     @Override
@@ -178,5 +183,37 @@ public class DemandasCalificadasServiceImpl implements DemandasCalificadasServic
         Map<String, Object> filtersNotEquals = new HashMap<>();
 
         return demandasCalificadasToKafkaDAO.getTotalDemandasCalificadas(filters, filtersNotEquals);
+    }
+
+    @Override
+    public Page<ResponseAdminDemandasPorInstancia> reporteAdminPorInstancia(
+            String SessionId,
+            InputAdminDemandasPorInstancia inputData,
+            Pageable pageable) {
+
+        validacionAdministrador.validarSesionAdministrador(SessionId);
+        validacionAdministrador.validarRangoFechas(inputData.getFechaInicial(), inputData.getFechaFinal());
+
+        return demandasCalificadasToKafkaDAO.reporteAdminPorInstancia(inputData, pageable);
+    }
+
+    @Override
+    public Page<ResponseAdminDemandasPorExpediente> reporteAdminPorExpediente(
+            String SessionId,
+            InputAdminDemandasPorExpediente inputData,
+            Pageable pageable) {
+
+        validacionAdministrador.validarSesionAdministrador(SessionId);
+        validacionAdministrador.validarRangoFechas(inputData.getFechaInicial(), inputData.getFechaFinal());
+
+        return demandasCalificadasToKafkaDAO.reporteAdminPorExpediente(inputData, pageable);
+    }
+
+    @Override
+    public List<DemandasCalificadasToKafka> detalleAdminPorNunico(String SessionId, Long nUnico) {
+
+        validacionAdministrador.validarSesionAdministrador(SessionId);
+
+        return demandasCalificadasToKafkaDAO.listarPorNunico(nUnico);
     }
 }

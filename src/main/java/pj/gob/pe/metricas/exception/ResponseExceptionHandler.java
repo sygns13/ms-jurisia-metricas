@@ -48,6 +48,14 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
 
     }
 
+    @ExceptionHandler(AccesoDenegadoException.class)
+    public ResponseEntity<ExceptionResponse> manejarAccesoDenegadoException(AccesoDenegadoException ex, WebRequest request){
+
+        ExceptionResponse er = new ExceptionResponse(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<ExceptionResponse>(er, HttpStatus.FORBIDDEN);
+
+    }
+
     @ExceptionHandler(ValidationServiceException.class)
     public ResponseEntity<ExceptionResponse> manejarValidationServiceException(ValidationServiceException ex, WebRequest request){
 

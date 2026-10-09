@@ -1,0 +1,991 @@
+{
+  "info": {
+    "_postman_id": "f0c12250-5037-4fb4-91ee-18ae49660b00",
+    "name": "ms-jurisia-metricas - Reportes Admin",
+    "description": "Reportes de administrador de ms-jurisia-metricas: calificaciones, sentencias y documentos generados por plantilla. Ver ENDPOINTS_Reportes_Admin_Metricas.md. Para llamar directo al microservicio (sin gateway) cambie gwMetricas a http://localhost:8013.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "00 Autenticación",
+      "item": [
+        {
+          "name": "Login (guarda token y sessionId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const r = pm.response.json();",
+                  "if (r && r.user) {",
+                  "    pm.collectionVariables.set('sessionId', r.user.userSessionsId);",
+                  "    if (r.user.token) pm.collectionVariables.set('token', r.user.token.access_token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"<usuario>\",\n  \"password\": \"<clave>\",\n  \"grantType\": \"password\",\n  \"clientId\": \"<clientId>\",\n  \"clientSecret\": \"<clientSecret>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{gwSecurity}}/v1/auth/login",
+              "host": [
+                "{{gwSecurity}}"
+              ],
+              "path": [
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login en ms-jurisia-security. Guarda sessionId (user.userSessionsId) y token (user.token.access_token) en variables de colección."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Demandas Calificadas",
+      "description": "Controller `DemandasCalificadasAdminController` — `/v1/admin/demandas-calificadas`. Solo usuarios tipo 1, 2 y 4.",
+      "item": [
+        {
+          "name": "Agrupado por instancia",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "SessionId",
+                "value": "{{sessionId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaInicial\": \"2026-01-01\",\n  \"fechaFinal\": \"2026-12-31\",\n  \"codSede\": \"0201\",\n  \"cinstancia\": \"301\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{gwMetricas}}/v1/admin/demandas-calificadas/agrupado-por-instancia?page=0&size=10",
+              "host": [
+                "{{gwMetricas}}"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "demandas-calificadas",
+                "agrupado-por-instancia"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Página (desde 0)"
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "description": "Tamaño de página"
+                }
+              ]
+            },
+            "description": "Una fila por sede + instancia. Obligatorios: fechaInicial, fechaFinal. Opcionales: codSede, cinstancia."
+          },
+          "response": []
+        },
+        {
+          "name": "Agrupado por instancia (sin filtros opcionales)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "SessionId",
+                "value": "{{sessionId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaInicial\": \"2026-01-01\",\n  \"fechaFinal\": \"2026-12-31\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{gwMetricas}}/v1/admin/demandas-calificadas/agrupado-por-instancia?page=0&size=10",
+              "host": [
+                "{{gwMetricas}}"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "demandas-calificadas",
+                "agrupado-por-instancia"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Página (desde 0)"
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "description": "Tamaño de página"
+                }
+              ]
+            },
+            "description": "Todas las sedes e instancias del rango."
+          },
+          "response": []
+        },
+        {
+          "name": "Agrupado por expediente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "SessionId",
+                "value": "{{sessionId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaInicial\": \"2026-01-01\",\n  \"fechaFinal\": \"2026-12-31\",\n  \"codSede\": \"0201\",\n  \"cinstancia\": \"301\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{gwMetricas}}/v1/admin/demandas-calificadas/agrupado-por-expediente?page=0&size=10",
+              "host": [
+                "{{gwMetricas}}"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "demandas-calificadas",
+                "agrupado-por-expediente"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Página (desde 0)"
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "description": "Tamaño de página"
+                }
+              ]
+            },
+            "description": "Una fila por expediente (nUnico) + usuario. Obligatorios: fechas, codSede, cinstancia."
+          },
+          "response": []
+        },
+        {
+          "name": "Agrupado por expediente (todos los filtros)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "SessionId",
+                "value": "{{sessionId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaInicial\": \"2026-01-01\",\n  \"fechaFinal\": \"2026-12-31\",\n  \"codSede\": \"0201\",\n  \"cinstancia\": \"301\",\n  \"idUser\": 25,\n  \"expNro\": \"00\",\n  \"anio\": \"2026\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{gwMetricas}}/v1/admin/demandas-calificadas/agrupado-por-expediente?page=0&size=10",
+              "host": [
+                "{{gwMetricas}}"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "demandas-calificadas",
+                "agrupado-por-expediente"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Página (desde 0)"
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "description": "Tamaño de página"
+                }
+              ]
+            },
+            "description": "Opcionales: idUser (exacto), expNro (contiene), anio (exacto)."
+          },
+          "response": []
+        },
+        {
+          "name": "Detalle por nUnico",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "SessionId",
+                "value": "{{sessionId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{gwMetricas}}/v1/admin/demandas-calificadas/detalle-por-nunico?nunico=2026002720201133",
+              "host": [
+                "{{gwMetricas}}"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "demandas-calificadas",
+                "detalle-por-nunico"
+              ],
+              "query": [
+                {
+                  "key": "nunico",
+                  "value": "2026002720201133",
+                  "description": "Número único del expediente"
+                }
+              ]
+            },
+            "description": "Todas las versiones del expediente (todos los usuarios), id DESC, con response y roleSystem."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Demandas Sentencias",
+      "description": "Controller `DemandasSentenciasAdminController` — `/v1/admin/demandas-sentencias`. Solo usuarios tipo 1, 2 y 4.",
+      "item": [
+        {
+          "name": "Agrupado por instancia",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "SessionId",
+                "value": "{{sessionId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaInicial\": \"2026-01-01\",\n  \"fechaFinal\": \"2026-12-31\",\n  \"codSede\": \"0201\",\n  \"cinstancia\": \"301\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{gwMetricas}}/v1/admin/demandas-sentencias/agrupado-por-instancia?page=0&size=10",
+              "host": [
+                "{{gwMetricas}}"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "demandas-sentencias",
+                "agrupado-por-instancia"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Página (desde 0)"
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "description": "Tamaño de página"
+                }
+              ]
+            },
+            "description": "Una fila por sede + instancia. Obligatorios: fechaInicial, fechaFinal. Opcionales: codSede, cinstancia."
+          },
+          "response": []
+        },
+        {
+          "name": "Agrupado por instancia (sin filtros opcionales)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "SessionId",
+                "value": "{{sessionId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaInicial\": \"2026-01-01\",\n  \"fechaFinal\": \"2026-12-31\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{gwMetricas}}/v1/admin/demandas-sentencias/agrupado-por-instancia?page=0&size=10",
+              "host": [
+                "{{gwMetricas}}"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "demandas-sentencias",
+                "agrupado-por-instancia"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Página (desde 0)"
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "description": "Tamaño de página"
+                }
+              ]
+            },
+            "description": "Todas las sedes e instancias del rango."
+          },
+          "response": []
+        },
+        {
+          "name": "Agrupado por expediente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "SessionId",
+                "value": "{{sessionId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaInicial\": \"2026-01-01\",\n  \"fechaFinal\": \"2026-12-31\",\n  \"codSede\": \"0201\",\n  \"cinstancia\": \"301\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{gwMetricas}}/v1/admin/demandas-sentencias/agrupado-por-expediente?page=0&size=10",
+              "host": [
+                "{{gwMetricas}}"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "demandas-sentencias",
+                "agrupado-por-expediente"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Página (desde 0)"
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "description": "Tamaño de página"
+                }
+              ]
+            },
+            "description": "Una fila por expediente (nUnico) + usuario. Obligatorios: fechas, codSede, cinstancia."
+          },
+          "response": []
+        },
+        {
+          "name": "Agrupado por expediente (todos los filtros)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "SessionId",
+                "value": "{{sessionId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaInicial\": \"2026-01-01\",\n  \"fechaFinal\": \"2026-12-31\",\n  \"codSede\": \"0201\",\n  \"cinstancia\": \"301\",\n  \"idUser\": 25,\n  \"expNro\": \"00\",\n  \"anio\": \"2026\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{gwMetricas}}/v1/admin/demandas-sentencias/agrupado-por-expediente?page=0&size=10",
+              "host": [
+                "{{gwMetricas}}"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "demandas-sentencias",
+                "agrupado-por-expediente"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Página (desde 0)"
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "description": "Tamaño de página"
+                }
+              ]
+            },
+            "description": "Opcionales: idUser (exacto), expNro (contiene), anio (exacto)."
+          },
+          "response": []
+        },
+        {
+          "name": "Detalle por nUnico",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "SessionId",
+                "value": "{{sessionId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{gwMetricas}}/v1/admin/demandas-sentencias/detalle-por-nunico?nunico=2026003080201133",
+              "host": [
+                "{{gwMetricas}}"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "demandas-sentencias",
+                "detalle-por-nunico"
+              ],
+              "query": [
+                {
+                  "key": "nunico",
+                  "value": "2026003080201133",
+                  "description": "Número único del expediente"
+                }
+              ]
+            },
+            "description": "Todas las versiones del expediente (todos los usuarios), id DESC, con response y roleSystem."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Documento Plantilla Generado",
+      "description": "Controller `DocumentoPlantillaGeneradoAdminController` — `/v1/admin/documento-plantilla-generado`. Solo usuarios tipo 1, 2 y 4.",
+      "item": [
+        {
+          "name": "Agrupado por instancia",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "SessionId",
+                "value": "{{sessionId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaInicial\": \"2026-01-01\",\n  \"fechaFinal\": \"2026-12-31\",\n  \"codSede\": \"0201\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{gwMetricas}}/v1/admin/documento-plantilla-generado/agrupado-por-instancia?page=0&size=10",
+              "host": [
+                "{{gwMetricas}}"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "documento-plantilla-generado",
+                "agrupado-por-instancia"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Página (desde 0)"
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "description": "Tamaño de página"
+                }
+              ]
+            },
+            "description": "Una fila por sede + instancia. Obligatorios: fechas. Opcionales: codSede, codInstancia."
+          },
+          "response": []
+        },
+        {
+          "name": "Agrupado por expediente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "SessionId",
+                "value": "{{sessionId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaInicial\": \"2026-01-01\",\n  \"fechaFinal\": \"2026-12-31\",\n  \"codSede\": \"0201\",\n  \"codInstancia\": \"702\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{gwMetricas}}/v1/admin/documento-plantilla-generado/agrupado-por-expediente?page=0&size=10",
+              "host": [
+                "{{gwMetricas}}"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "documento-plantilla-generado",
+                "agrupado-por-expediente"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Página (desde 0)"
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "description": "Tamaño de página"
+                }
+              ]
+            },
+            "description": "Una fila por expediente (nUnico) + usuario. Obligatorios: fechas, codSede, codInstancia."
+          },
+          "response": []
+        },
+        {
+          "name": "Agrupado por expediente (todos los filtros)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "SessionId",
+                "value": "{{sessionId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaInicial\": \"2026-01-01\",\n  \"fechaFinal\": \"2026-12-31\",\n  \"codSede\": \"0201\",\n  \"codInstancia\": \"702\",\n  \"idUser\": 25,\n  \"expNro\": \"00012\",\n  \"anio\": \"2025\",\n  \"idTipoDocumento\": 5,\n  \"idDocumento\": 16\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{gwMetricas}}/v1/admin/documento-plantilla-generado/agrupado-por-expediente?page=0&size=10",
+              "host": [
+                "{{gwMetricas}}"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "documento-plantilla-generado",
+                "agrupado-por-expediente"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Página (desde 0)"
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "description": "Tamaño de página"
+                }
+              ]
+            },
+            "description": "Opcionales: idUser, expNro (contiene), anio, idTipoDocumento, idDocumento."
+          },
+          "response": []
+        },
+        {
+          "name": "Agrupado por tipo de documento (documento = TODOS)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "SessionId",
+                "value": "{{sessionId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaInicial\": \"2026-01-01\",\n  \"fechaFinal\": \"2026-12-31\",\n  \"codSede\": \"0201\",\n  \"codInstancia\": \"702\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{gwMetricas}}/v1/admin/documento-plantilla-generado/agrupado-por-documento?page=0&size=10",
+              "host": [
+                "{{gwMetricas}}"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "documento-plantilla-generado",
+                "agrupado-por-documento"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Página (desde 0)"
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "description": "Tamaño de página"
+                }
+              ]
+            },
+            "description": "Sin idDocumento: una fila por tipo de documento, documento = TODOS."
+          },
+          "response": []
+        },
+        {
+          "name": "Agrupado por tipo de documento y documento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "SessionId",
+                "value": "{{sessionId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaInicial\": \"2026-01-01\",\n  \"fechaFinal\": \"2026-12-31\",\n  \"codSede\": \"0201\",\n  \"codInstancia\": \"702\",\n  \"idTipoDocumento\": 5,\n  \"idDocumento\": 16\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{gwMetricas}}/v1/admin/documento-plantilla-generado/agrupado-por-documento?page=0&size=10",
+              "host": [
+                "{{gwMetricas}}"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "documento-plantilla-generado",
+                "agrupado-por-documento"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Página (desde 0)"
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "description": "Tamaño de página"
+                }
+              ]
+            },
+            "description": "Con idDocumento: una fila por tipo de documento + documento."
+          },
+          "response": []
+        },
+        {
+          "name": "Detalle (filas)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "SessionId",
+                "value": "{{sessionId}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaInicial\": \"2026-01-01\",\n  \"fechaFinal\": \"2026-12-31\",\n  \"codInstancia\": \"702\",\n  \"idDocumento\": 16\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{gwMetricas}}/v1/admin/documento-plantilla-generado/detalle?page=0&size=10",
+              "host": [
+                "{{gwMetricas}}"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "documento-plantilla-generado",
+                "detalle"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Página (desde 0)"
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "description": "Tamaño de página"
+                }
+              ]
+            },
+            "description": "Filas de CabDocumentoPlantillaGenerado, más recientes primero. Obligatorios: fechas; resto opcional."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "gwMetricas",
+      "value": "http://localhost:8020/api/metricas"
+    },
+    {
+      "key": "gwSecurity",
+      "value": "http://localhost:8020/api/security"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "sessionId",
+      "value": ""
+    }
+  ]
+}

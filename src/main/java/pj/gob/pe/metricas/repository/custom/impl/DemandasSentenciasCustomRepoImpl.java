@@ -7,6 +7,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.beans.factory.annotation.Autowired;
+import pj.gob.pe.metricas.utils.inputs.demandasadmin.InputAdminDemandasPorExpediente;
+import pj.gob.pe.metricas.utils.inputs.demandasadmin.InputAdminDemandasPorInstancia;
+import pj.gob.pe.metricas.utils.responses.demandasadmin.ResponseAdminDemandasPorExpediente;
+import pj.gob.pe.metricas.utils.responses.demandasadmin.ResponseAdminDemandasPorInstancia;
 import pj.gob.pe.metricas.model.entities.DemandasSentenciasToKafka;
 import pj.gob.pe.metricas.repository.custom.DemandasSentenciasCustomRepo;
 
@@ -21,6 +26,9 @@ public class DemandasSentenciasCustomRepoImpl implements DemandasSentenciasCusto
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Autowired
+    private DemandasAdminReporteQuery demandasAdminReporteQuery;
 
     @Override
     public Page<DemandasSentenciasToKafka> getGeneralDemandasSentencias(Map<String, Object> filters, Map<String, Object> notEqualFilters, Map<String, Object> filtersFecha, Pageable pageable) {
@@ -153,5 +161,19 @@ public class DemandasSentenciasCustomRepoImpl implements DemandasSentenciasCusto
         Predicate notEqualPredicate = notEqualPredicates.isEmpty() ? cb.conjunction() : cb.and(notEqualPredicates.toArray(new Predicate[0]));
 
         return cb.and(orPredicate, andPredicate, notEqualPredicate);
+    }
+
+    @Override
+    public Page<ResponseAdminDemandasPorInstancia> reporteAdminPorInstancia(
+            InputAdminDemandasPorInstancia input,
+            Pageable pageable) {
+        return demandasAdminReporteQuery.agrupadoPorInstancia(DemandasAdminReporteQuery.Tabla.SENTENCIAS, input, pageable);
+    }
+
+    @Override
+    public Page<ResponseAdminDemandasPorExpediente> reporteAdminPorExpediente(
+            InputAdminDemandasPorExpediente input,
+            Pageable pageable) {
+        return demandasAdminReporteQuery.agrupadoPorExpediente(DemandasAdminReporteQuery.Tabla.SENTENCIAS, input, pageable);
     }
 }

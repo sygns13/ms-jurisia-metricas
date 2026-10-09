@@ -7,7 +7,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.beans.factory.annotation.Autowired;
 import pj.gob.pe.metricas.model.entities.CabDocumentoPlantillaGenerado;
+import pj.gob.pe.metricas.utils.inputs.docplantillaadmin.InputAdminDocPlantillaDetalle;
+import pj.gob.pe.metricas.utils.inputs.docplantillaadmin.InputAdminDocPlantillaFiltros;
+import pj.gob.pe.metricas.utils.inputs.docplantillaadmin.InputAdminDocPlantillaPorInstancia;
+import pj.gob.pe.metricas.utils.responses.docplantillaadmin.ResponseAdminDocPlantillaPorDocumento;
+import pj.gob.pe.metricas.utils.responses.docplantillaadmin.ResponseAdminDocPlantillaPorExpediente;
+import pj.gob.pe.metricas.utils.responses.docplantillaadmin.ResponseAdminDocPlantillaPorInstancia;
 import pj.gob.pe.metricas.repository.custom.CabDocumentoPlantillaGeneradoCustomRepo;
 
 import java.time.LocalDate;
@@ -21,6 +28,9 @@ public class CabDocumentoPlantillaGeneradoCustomRepoImpl implements CabDocumento
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Autowired
+    private DocPlantillaAdminReporteQuery docPlantillaAdminReporteQuery;
 
     @Override
     public Page<CabDocumentoPlantillaGenerado> getDocumentosPlantillaGenerados(
@@ -97,5 +107,25 @@ public class CabDocumentoPlantillaGeneradoCustomRepoImpl implements CabDocumento
         }
 
         return predicates.isEmpty() ? cb.conjunction() : cb.and(predicates.toArray(new Predicate[0]));
+    }
+
+    @Override
+    public Page<ResponseAdminDocPlantillaPorInstancia> reporteAdminPorInstancia(InputAdminDocPlantillaPorInstancia input, Pageable pageable) {
+        return docPlantillaAdminReporteQuery.agrupadoPorInstancia(input, pageable);
+    }
+
+    @Override
+    public Page<ResponseAdminDocPlantillaPorExpediente> reporteAdminPorExpediente(InputAdminDocPlantillaFiltros input, Pageable pageable) {
+        return docPlantillaAdminReporteQuery.agrupadoPorExpediente(input, pageable);
+    }
+
+    @Override
+    public Page<ResponseAdminDocPlantillaPorDocumento> reporteAdminPorDocumento(InputAdminDocPlantillaFiltros input, Pageable pageable) {
+        return docPlantillaAdminReporteQuery.agrupadoPorDocumento(input, pageable);
+    }
+
+    @Override
+    public Page<CabDocumentoPlantillaGenerado> detalleAdmin(InputAdminDocPlantillaDetalle input, Pageable pageable) {
+        return docPlantillaAdminReporteQuery.detalle(input, pageable);
     }
 }
