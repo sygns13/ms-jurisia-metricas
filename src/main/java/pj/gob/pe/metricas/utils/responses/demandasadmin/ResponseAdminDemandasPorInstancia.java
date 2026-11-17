@@ -76,6 +76,6 @@ public class ResponseAdminDemandasPorInstancia {
     @Schema(description = "Fecha de la última ejecución del periodo")
     private LocalDateTime fechaUltimaOperacion;
 
-    @Schema(description = "Modelos de IA utilizados, separados por coma", example = "gemini-3.1-pro-preview")
+    @Schema(description = "Modelos de IA utilizados, separados por coma", example = "gemini-4-argon")
     private String modelosUtilizados;
 }

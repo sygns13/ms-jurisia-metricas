@@ -133,6 +133,6 @@ public class ResponseAdminDemandasPorExpediente {
     @Schema(description = "Status de la última versión (0 iniciada, 1 exitosa, 2 error archivo, 3 error Gemini)")
     private Integer statusUltimoRegistro;
 
-    @Schema(description = "Modelos de IA utilizados, separados por coma", example = "gemini-3.1-pro-preview")
+    @Schema(description = "Modelos de IA utilizados, separados por coma", example = "gemini-4-argon")
     private String modelosUtilizados;
 }

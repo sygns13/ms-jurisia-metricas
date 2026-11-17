@@ -98,6 +98,6 @@ public abstract class ResponseAdminDocPlantillaMetricas {
     @Schema(description = "Plantillas utilizadas (codigo vN), separadas por coma", example = "template_auto_01_doc16 v2")
     private String plantillasUtilizadas;
 
-    @Schema(description = "Modelos de IA utilizados, separados por coma", example = "gemini-3.1-pro-preview")
+    @Schema(description = "Modelos de IA utilizados, separados por coma", example = "gemini-4-argon")
     private String modelosUtilizados;
 }
